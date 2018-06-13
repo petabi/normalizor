@@ -1,14 +1,11 @@
 
 #include <cstring>
-#include <fstream>
 #include <istream>
 #include <map>
 #include <string>
 #include <tuple>
 #include <vector>
 
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include <hs/hs_compile.h>
 #include <hs/hs_runtime.h>
 
@@ -19,8 +16,6 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
                               unsigned long long to, unsigned int,
                               void* scractch_ctx)
 {
-  // 1. find the line -- need to know where line starts and ends.
-  // 2. find the sections
   struct Line_context* ctx = static_cast<struct Line_context*>(scractch_ctx);
   if (id == 0) {
     ctx->parsed_lines.emplace_back(Normal_line(std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary), ctx->cur_sections));
@@ -31,9 +26,9 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
     size_t relative_end = static_cast<size_t>(to - ctx->last_boundary);
     auto start_it = ctx->cur_sections.find(relative_start);
     if (start_it == ctx->cur_sections.end() ||
-        ctx->cur_sections[relative_start].first < relative_end ||
-        (ctx->cur_sections[relative_start].first == relative_end  &&
-         ctx->cur_sections[relative_start].second > id))
+        ctx->cur_sections[relative_start].second < relative_end ||
+        (ctx->cur_sections[relative_start].second == relative_end  &&
+         static_cast<unsigned int>(ctx->cur_sections[relative_start].first) > id))
     {
       ctx->cur_sections[relative_start] = std::make_tuple(relative_end, id);
     }
@@ -48,10 +43,13 @@ bool Line_normalizer::read_block(std::istream& in) {
       return false;
 
   // walk stream back to last newline.
-  long last_line_end = blocksize - 1;
-  for (; last_line_end >= 0 && block[last_line_end] != '\n';
-       last_line_end -= 1) {}
-  in.seekg((blocksize - last_line_end), std::ios_base::cur);
+  std::streampos last_newline = blocksize - 1;
+  for (; last_newline >= 0 && block[last_newline] != '\n';
+       last_newline -= 1) {}
+  if (last_newline >= 0) {
+    in.seekg((static_cast<std::streampos>(blocksize) - last_newline),
+             std::ios_base::cur);
+  }
   return true;
 }
 
@@ -65,8 +63,10 @@ std::vector<Normal_line> Line_normalizer::normalize(std::istream& in) {
     readmore = read_block(in);
     lines.cur_sections.clear();
     lines.last_boundary = 0;
-    hs_scan(hs_db.get(), block, in.gcount(), 0, hs_scratch.get(), on_match,
-            static_cast<void*>(&lines));
+    if (in.gcount() > 0) {
+      hs_scan(hs_db.get(), block, static_cast<unsigned int>(in.gcount()), 0,
+              hs_scratch.get(), on_match, static_cast<void*>(&lines));
+    }
   }
   return lines.parsed_lines;
 }
@@ -80,11 +80,12 @@ bool Line_normalizer::build_hs_database() {
   regexes.reserve(normal_types.size());
   for (const auto& nt : this->normal_types) {
     regexes.push_back(nt.second.regex.c_str());
-    flags.push_back(nt.second.flags | HS_FLAG_SOM_LEFTMOST);
-    ids.push_back(nt.first);
+    flags.push_back(static_cast<unsigned int>(nt.second.flags) | HS_FLAG_SOM_LEFTMOST);
+    ids.push_back(static_cast<unsigned int>(nt.first));
   }
 
-  if (hs_compile_multi(regexes.data(), flags.data(), ids.data(), regexes.size(),
+  if (hs_compile_multi(regexes.data(), flags.data(), ids.data(),
+                       static_cast<unsigned int>(regexes.size()),
                        HS_MODE_BLOCK, nullptr, &db, &err) != HS_SUCCESS) {
     hs_free_database(db);
     hs_free_compile_error(err);
@@ -99,19 +100,4 @@ bool Line_normalizer::build_hs_database() {
   }
   this->hs_scratch.reset(hs_sc);
   return true;
-}
-
-int main(int argc, char* argv[])
-{
-  Line_normalizer norm;
-  std::filebuf fb;
-  std::vector<Normal_line> lines;
-  if (fb.open("access-1024.log", std::ios_base::in)) {
-    std::istream in(&fb);
-    lines = norm.normalize(in);
-  }
-  printf("lines: ");
-  for (const auto& l : lines) {
-    printf("  l: %s\n", l.line.c_str());
-  }
 }

@@ -1,1 +1,24 @@
+cmake_minimum_required(VERSION 3.10)
+
+set(CMAKE_CXX_STANDARD 14)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat-pedantic")
+endif()
+if(NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-O")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+endif()
+if(NOT CMAKE_CXX_FLAGS_RELEASE MATCHES "-O")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+endif()
+
+include(GNUInstallDirs)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 subdirs(src)
+subdirs(tools)

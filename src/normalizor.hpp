@@ -12,10 +12,10 @@
 #include <hs/hs_runtime.h>
 
 struct Normal_type {
-  Normal_type(std::string re, int f, std::string rep) : regex(re), flags(f),
+  Normal_type(std::string re, unsigned int f, std::string rep) : regex(re), flags(f),
               replacement(rep) {}
   std::string regex;
-  int flags;
+  size_t flags;
   std::string replacement;
 };
 
@@ -38,7 +38,7 @@ struct Line_context {
 
 class Line_normalizer {
 public:
-  Line_normalizer() {};
+  Line_normalizer() {}
   void clear_context() {
     context.block = nullptr;
     context.last_boundary = 0;
@@ -57,7 +57,7 @@ private:
   struct Line_context context;
   std::unique_ptr<hs_database_t, decltype(hs_free_database)*> hs_db{nullptr, &hs_free_database};
   const std::map<size_t, const struct Normal_type> normal_types = {
-    {0, Normal_type(R"(\n)", 0, "<NL>")},
+    {0, Normal_type(R"(\n)", 0u, "<NL>")},
     {1, Normal_type(R"((((\d{1,2}|\d{4})[-\/\s](\d{1,2}|jan|feb|mar|)"
                     R"(apr|may|jun|jul|aug|sep|oct|nov|dec)[-\/\s](\d{4}|)"
                     R"(\d{1,2})|((jan(uary)?|feb(uary)?|mar(ch)?|apr(il)?|)"
@@ -67,13 +67,13 @@ private:
                     R"((\s(am|pm|[+-](\d{3,4}|\d{2}[:]\d{2})))?)?))",
                     HS_FLAG_CASELESS, "<TS>")},
     {2, Normal_type(R"(\d{1,3}[-.]\d{1,3}[-.]\d{1,3}[-.]\d{1,3}(\/\d{1,2})?)",
-                    0, "<IP>")},
+                    0u, "<IP>")},
     {3, Normal_type(R"(;base64,([0-9A-Za-z+/]{4}|[0-9A-Za-z+/]{3}=|)"
-                    R"([0-9A-Za-z+/]{2}==)+)", 0, "<B64>")},
+                    R"([0-9A-Za-z+/]{2}==)+)", 0u, "<B64>")},
     {4, Normal_type(R"((\x5c{1,2}x[0-9A-Fa-f]{2}|%[0-9A-Fa-f]{2}|)"
-                    R"([\x7f-\xff])+)", 0, "<HEX>")},
-    {5, Normal_type(R"([v/]?\d{1,3}[._]\d{1,3}([._]\d{1,3})?\b)", 0, "<VN>")},
-    {6, Normal_type(R"(\d+(\.\d+)?)", 0, "<DEC>")}
+                    R"([\x7f-\xff])+)", 0u, "<HEX>")},
+    {5, Normal_type(R"([v/]?\d{1,3}[._]\d{1,3}([._]\d{1,3})?\b)", 0u, "<VN>")},
+    {6, Normal_type(R"(\d+(\.\d+)?)", 0u, "<DEC>")}
   };
   std::unique_ptr<hs_scratch_t, decltype(hs_free_scratch)*> hs_scratch{nullptr, &hs_free_scratch};
 };

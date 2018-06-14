@@ -20,5 +20,11 @@ endif()
 include(GNUInstallDirs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+find_package(GTest)
+
 subdirs(src)
+if(GTEST_FOUND)
+  enable_testing()
+  subdirs(tests)
+endif()
 subdirs(tools)

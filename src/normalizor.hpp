@@ -52,7 +52,7 @@ private:
   bool read_block(std::istream& in);
   static int on_match(unsigned int id, unsigned long long start,
                       unsigned long long to, unsigned int, void* ctx);
-  static constexpr size_t blocksize = 8192;
+  static constexpr size_t blocksize = 65536;
   char block[blocksize] = {0};
   struct Line_context context;
   std::unique_ptr<hs_database_t, decltype(hs_free_database)*> hs_db{nullptr, &hs_free_database};

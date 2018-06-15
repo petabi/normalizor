@@ -12,6 +12,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include <gperftools/profiler.h>
 
 #include "normalizor.hpp"
 
@@ -25,12 +26,13 @@ int main(int argc, char* argv[])
   std::vector<Normal_line> lines;
   std::string log_file;
   po::options_description posargs;
-  posargs.add_options()("logfile", po::value<std::string>(&log_file),
+  posargs.add_options()("log_file", po::value<std::string>(&log_file),
                         "Log file to normalize.");
   po::positional_options_description positions;
   positions.add("log_file", 1);
   po::options_description optargs("Options");
   optargs.add_options()("help,h", "Print usage information.");
+  optargs.add_options()("profile,p", "Dump profile results to normalizor_profile.txt");
   po::options_description cliargs;
   cliargs.add(posargs).add(optargs);
   po::options_description cliopts;
@@ -47,15 +49,20 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   po::notify(args);
+  std::cout << "Normalizor: Starting Normalization!\n";
+  if (args.count("profile")) {
+    ProfilerStart("normalizer_profile.txt");
+  }
   getrusage(RUSAGE_SELF, &start);
   if (fb.open(log_file.c_str(), std::ios_base::in)) {
     std::istream in(&fb);
     lines = norm.normalize(in);
   }
   getrusage(RUSAGE_SELF, &end);
-  printf("lines: ");
-  for (const auto& l : lines) {
-    printf("  l: %s\n", l.line.c_str());
+  std::cout << "Normalization Complete!\n";
+  if (args.count("profile")) {
+    ProfilerFlush();
+    ProfilerStop();
   }
   struct timeval diff, total;
   timersub(&(end.ru_utime), &(start.ru_utime), &total);

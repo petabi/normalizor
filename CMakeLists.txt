@@ -19,6 +19,7 @@ endif()
 
 include(GNUInstallDirs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options system)
 
 find_package(GTest)
 

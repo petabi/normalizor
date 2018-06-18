@@ -11,7 +11,6 @@
 
 #include "normalizor.hpp"
 
-
 int Line_normalizer::on_match(unsigned int id, unsigned long long start,
                               unsigned long long to, unsigned int,
                               void* scractch_ctx)
@@ -37,20 +36,19 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
 }
 
 // Return False on failure or end of file, true on end is not reached yet.
-bool Line_normalizer::read_block(std::istream& in) {
+size_t Line_normalizer::read_block(std::istream& in) {
   in.read(block, blocksize);
-  if (in.eof() || !in)
-      return false;
-
-  // walk stream back to last newline.
-  std::streampos last_newline = blocksize - 1;
-  for (; last_newline >= 0 && block[last_newline] != '\n';
-       last_newline -= 1) {}
-  if (last_newline >= 0) {
-    in.seekg((static_cast<std::streampos>(blocksize) - last_newline),
-             std::ios_base::cur);
+  if (in.eof()) {
+    return static_cast<size_t>(in.gcount());
   }
-  return true;
+  if (!in)
+      return 0;
+  // walk stream back to last newline.
+  long chars_read = static_cast<long>(in.gcount());
+  long last_newline = chars_read;
+  for (; last_newline > 0 && block[last_newline - 1] != '\n'; --last_newline) {}
+  in.seekg(static_cast<std::streamoff>(last_newline - chars_read), std::ios_base::cur);
+  return static_cast<size_t>(last_newline);
 }
 
 // Return vector of sections defining all sections
@@ -58,15 +56,15 @@ std::vector<Normal_line> Line_normalizer::normalize(std::istream& in) {
   Line_context lines(block);
   if (!build_hs_database())
     return lines.parsed_lines;
-  bool readmore = true;
-  while (readmore) {
-    readmore = read_block(in);
+  size_t char_read = read_block(in);
+  while (char_read > 0) {
     lines.cur_sections.clear();
     lines.last_boundary = 0;
     if (in.gcount() > 0) {
-      hs_scan(hs_db.get(), block, static_cast<unsigned int>(in.gcount()), 0,
+      hs_scan(hs_db.get(), block, static_cast<unsigned int>(char_read), 0,
               hs_scratch.get(), on_match, static_cast<void*>(&lines));
     }
+    char_read = read_block(in);
   }
   return lines.parsed_lines;
 }

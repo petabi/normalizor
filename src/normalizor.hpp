@@ -49,7 +49,7 @@ public:
 
 private:
   bool build_hs_database();
-  bool read_block(std::istream& in);
+  size_t read_block(std::istream& in);
   static int on_match(unsigned int id, unsigned long long start,
                       unsigned long long to, unsigned int, void* ctx);
   static constexpr size_t blocksize = 65536;

@@ -21,8 +21,9 @@ struct Normal_type {
 
 struct Normal_line {
   Normal_line(std::string l,
-              std::map<size_t, std::pair<int, size_t>> secs) : line(l),
-              sections(secs) {}
+              std::map<size_t, std::pair<int, size_t>>& secs) : line(l) {
+    std::swap(secs, sections);
+  }
   std::string line;
   std::map<size_t, std::pair<int, size_t>> sections;
 };

@@ -57,6 +57,7 @@ std::vector<Normal_line> Line_normalizer::normalize(std::istream& in) {
   if (!build_hs_database())
     return lines.parsed_lines;
   size_t char_read = read_block(in);
+  lines.parsed_lines.reserve(blocksize);
   while (char_read > 0) {
     lines.cur_sections.clear();
     lines.last_boundary = 0;

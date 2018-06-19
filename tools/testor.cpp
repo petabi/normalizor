@@ -32,7 +32,9 @@ int main(int argc, char* argv[])
   positions.add("log_file", 1);
   po::options_description optargs("Options");
   optargs.add_options()("help,h", "Print usage information.");
-  optargs.add_options()("profile,p", "Dump profile results to normalizor_profile.txt");
+  optargs.add_options()("profile,p",
+                        "Dump profile results to normalizor_profile.txt");
+  optargs.add_options()("debug,d", "Print all lines parsed.");
   po::options_description cliargs;
   cliargs.add(posargs).add(optargs);
   po::options_description cliopts;
@@ -67,11 +69,20 @@ int main(int argc, char* argv[])
   struct timeval diff, total;
   timersub(&(end.ru_utime), &(start.ru_utime), &total);
   timersub(&(end.ru_stime), &(start.ru_stime), &diff);
-  std::cout << "total time to process:" << "\n";
   timeradd(&total, &diff, &total);
-  std::cout << total.tv_sec << "." << total.tv_usec << "\n";
-  std::cout << "Total lines processed:";
+  double total_proc_time = static_cast<double>(total.tv_sec) +
+                           (static_cast<double>(total.tv_usec) / 1000000.0);
+  if (args.count("debug")) {
+    std::cout << "Printing Debug information\n";
+    for (auto& l : lines) {
+      std::cout << l.line.c_str();
+    }
+  }
+  std::cout << "Processing Statistics\n";
+  std::cout << "--Total time to process: " << std::to_string(total_proc_time);
+  std::cout << "\n";
+  std::cout << "--Total lines processed: ";
   std::cout << std::to_string(lines.size()) << "\n";
-  std::cout << "lines per sec: " << std::to_string(lines.size() / (static_cast<double>(total.tv_sec) + static_cast<double>(total.tv_usec / 1000000))) << "\n";
-  
+  std::cout << "--Lines per sec: " << std::to_string(
+  static_cast<double>(lines.size()) / total_proc_time) << "\n";
 }

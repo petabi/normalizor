@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <sys/resource.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <tuple>
 #include <vector>
@@ -74,9 +75,17 @@ int main(int argc, char* argv[])
                            (static_cast<double>(total.tv_usec) / 1000000.0);
   if (args.count("debug")) {
     std::cout << "Printing Debug information\n";
-    for (auto& l : lines) {
+    for (const auto& l : lines) {
       std::cout << l.line.c_str();
     }
+  }
+  struct stat file_stats;
+  stat(log_file.c_str(), &file_stats);
+  double bytes_per_sec = static_cast<double>(file_stats.st_size) /
+                         total_proc_time;
+  size_t line_sum = 0.0;
+  for (const auto& l : lines) {
+    line_sum += l.line.size();
   }
   std::cout << "Processing Statistics\n";
   std::cout << "--Total time to process: " << std::to_string(total_proc_time);
@@ -84,5 +93,11 @@ int main(int argc, char* argv[])
   std::cout << "--Total lines processed: ";
   std::cout << std::to_string(lines.size()) << "\n";
   std::cout << "--Lines per sec: " << std::to_string(
-  static_cast<double>(lines.size()) / total_proc_time) << "\n";
+               static_cast<double>(lines.size()) / total_proc_time) << "\n";
+  std::cout << "--Average Characters per Line: " <<
+            static_cast<double>(line_sum) /
+            static_cast<double>(lines.size()) << "\n";
+  std::cout << "--Bytes per sec: " <<
+                std::to_string(bytes_per_sec) << " (" << std::to_string(
+                bytes_per_sec / 1024.0 / 1024.0) << " MB per sec)\n";
 }

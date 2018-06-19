@@ -17,7 +17,9 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
 {
   struct Line_context* ctx = static_cast<struct Line_context*>(scractch_ctx);
   if (id == 0) {
-    ctx->parsed_lines.emplace_back(Normal_line(std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary), ctx->cur_sections));
+    ctx->parsed_lines.push_back(Normal_line(std::string(
+        &ctx->block[ctx->last_boundary], to - ctx->last_boundary),
+        ctx->cur_sections));
     ctx->cur_sections.clear();
     ctx->last_boundary = to;
   } else {

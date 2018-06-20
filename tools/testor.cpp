@@ -1,4 +1,9 @@
 //===-------- testor.cpp, basic testing for normalizor -------------------===//
+/*!
+ * Copyright (c) 2017-2018 Petabi, Inc.
+ * All rights reserved.
+ */
+
 #include <cstring>
 #include <fstream>
 #include <iostream>

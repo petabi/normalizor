@@ -1,4 +1,4 @@
-#include <cstdio>
+
 #include <fstream>
 #include <istream>
 #include <ostream>
@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "normalizor.hpp"
+#include "normalizor.h"
 
 static void build_log_file(const std::string& fname, size_t total_lines) {
   std::filebuf fb;
@@ -26,7 +26,6 @@ static void build_log_file(const std::string& fname, size_t total_lines) {
     myline.append(le + std::to_string(i) + "\n");
     out.write(myline.c_str(), static_cast<std::streamsize>(myline.size()));
   }
-  out.flush();
 }
 
 TEST (test_basic_normalization, test_normalize_lines) {
@@ -52,7 +51,25 @@ TEST (test_basic_normaliztion, test_sections) {
   EXPECT_EQ(lines.front().sections.size(), 6);
   unsigned int sec_id = 1;
   auto sec_it = lines.front().sections.begin();
+  EXPECT_EQ(lines.front().line, my_line);
   for (; sec_it != lines.front().sections.end(); ++sec_id, ++sec_it) {
     EXPECT_EQ(sec_id, sec_it->second.first);
+  }
+}
+
+TEST (test_basic_normalization, test_non_ascii) {
+  std::string my_line("lala ησε lala ×ÀÃæ lala πεμας lala\n");
+  Line_normalizer norm;
+  std::istringstream in(my_line);
+  auto lines = norm.normalize(in);
+  EXPECT_FALSE(lines.empty());
+  EXPECT_EQ(lines.front().line, my_line);
+  EXPECT_EQ(lines.front().sections.size(), 3);
+  for (const auto& s : lines.front().sections) {
+    EXPECT_EQ(s.second.first, 4);
+    auto substr = my_line.substr(s.first, s.second.second - s.first);
+    for (const auto& c : substr) {
+      EXPECT_GT(static_cast<unsigned int>(c), 126);
+    }
   }
 }

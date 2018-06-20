@@ -1,4 +1,4 @@
-
+//===-------- testor.cpp, basic testing for normalizor -------------------===//
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -15,7 +15,7 @@
 #include <boost/program_options.hpp>
 #include <gperftools/profiler.h>
 
-#include "normalizor.hpp"
+#include "normalizor.h"
 
 namespace po = boost::program_options;
 

@@ -17,10 +17,24 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
 {
   struct Line_context* ctx = static_cast<struct Line_context*>(scractch_ctx);
   if (id == 0) {
-    ctx->parsed_lines.push_back(Normal_line(std::string(
-        &ctx->block[ctx->last_boundary], to - ctx->last_boundary),
-        ctx->cur_sections));
-    ctx->cur_sections.clear();
+    if (!ctx->cur_sections.empty()) {
+      size_t longest = ctx->cur_sections.begin()->second.second;
+      auto sec_it = ctx->cur_sections.begin();
+      ++sec_it;
+      auto end_it = ctx->cur_sections.end();
+      while (sec_it != end_it) {
+        if (sec_it->first < longest) {
+          sec_it = ctx->cur_sections.erase(sec_it);
+        } else {
+          longest = sec_it->second.second;
+          ++sec_it;
+        }
+      }
+      ctx->parsed_lines.push_back(Normal_line(std::string(
+          &ctx->block[ctx->last_boundary], to - ctx->last_boundary),
+          ctx->cur_sections));
+      ctx->cur_sections.clear();
+    }
     ctx->last_boundary = to;
   } else {
     size_t relative_start = static_cast<size_t>(start - ctx->last_boundary);
@@ -31,7 +45,7 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
         (ctx->cur_sections[relative_start].second == relative_end  &&
          static_cast<unsigned int>(ctx->cur_sections[relative_start].first) > id))
     {
-      ctx->cur_sections[relative_start] = std::make_tuple(relative_end, id);
+      ctx->cur_sections[relative_start] = std::make_tuple(id, relative_end);
     }
   }
   return 0;

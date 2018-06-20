@@ -2,6 +2,8 @@
 #include <fstream>
 #include <istream>
 #include <ostream>
+#include <sstream>
+#include <string>
 #include <time.h>
 
 #include <gtest/gtest.h>
@@ -38,4 +40,19 @@ TEST (test_basic_normalization, test_normalize_lines) {
   auto lines = norm.normalize(in);
   EXPECT_EQ(lines.size(), total_lines);
   remove(my_log_file.c_str());
+}
+
+TEST (test_basic_normaliztion, test_sections) {
+  std::string my_line = "12/31/1999 12:59:59 an ip 4.56.789.0 a"
+                        ";base64,0A1B a hex \\x0b and a vn v1.2_3"
+                        " a num 123 lala\n";
+  Line_normalizer norm;
+  std::istringstream in(my_line);
+  auto lines = norm.normalize(in);
+  EXPECT_EQ(lines.front().sections.size(), 6);
+  unsigned int sec_id = 1;
+  auto sec_it = lines.front().sections.begin();
+  for (; sec_it != lines.front().sections.end(); ++sec_id, ++sec_it) {
+    EXPECT_EQ(sec_id, sec_it->second.first);
+  }
 }

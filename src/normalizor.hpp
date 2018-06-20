@@ -58,7 +58,7 @@ private:
   struct Line_context context;
   std::unique_ptr<hs_database_t, decltype(hs_free_database)*> hs_db{nullptr, &hs_free_database};
   const std::map<size_t, const struct Normal_type> normal_types = {
-    {0, Normal_type(R"(\n)", 0u, "<NL>")},
+    {0, Normal_type(R"(\n|\r\n)", 0u, "<NL>")},
     {1, Normal_type(R"((((\d{1,2}|\d{4})[-\/\s](\d{1,2}|jan|feb|mar|)"
                     R"(apr|may|jun|jul|aug|sep|oct|nov|dec)[-\/\s](\d{4}|)"
                     R"(\d{1,2})|((jan(uary)?|feb(uary)?|mar(ch)?|apr(il)?|)"

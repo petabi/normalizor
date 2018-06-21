@@ -46,7 +46,7 @@
 struct Normal_type {
   Normal_type() : regex(), flags(0), replacement() {}
   explicit Normal_type(std::string re, unsigned int f, std::string rep)
-      : regex(re), flags(f), replacement(rep)
+      : regex(std::move(re)), flags(f), replacement(std::move(rep))
   {
   }
   Normal_type(const struct Normal_type&) = default;
@@ -110,7 +110,6 @@ struct Line_context {
  */
 class Line_normalizer {
 public:
-  Line_normalizer() {}
 
   /*!
    * \brief Provides a copy of the current set of Normal_types used for this
@@ -123,7 +122,7 @@ public:
    * \returns map of normal types where map key is the 'ID" for the normal_type
    *          and the value is the Normal_type object.
    */
-  const std::map<size_t, struct Normal_type> get_current_normal_types() const
+  const std::map<size_t, struct Normal_type>& get_current_normal_types() const
   {
     return normal_types;
   }
@@ -153,7 +152,7 @@ public:
    */
   void modify_current_normal_types(size_t nt_id, struct Normal_type nt)
   {
-    normal_types[nt_id] = nt;
+    normal_types[nt_id] = std::move(nt);
   }
 
   /*!

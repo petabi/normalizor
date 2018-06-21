@@ -87,7 +87,7 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
           ++sec_it;
         }
       }
-      ctx->parsed_lines.push_back(Normal_line(
+      ctx->parsed_lines.emplace_back(Normal_line(
           std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary),
           ctx->cur_sections));
     }

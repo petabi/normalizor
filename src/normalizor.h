@@ -45,8 +45,10 @@
  */
 struct Normal_type {
   Normal_type() : regex(), flags(0), replacement() {}
-  explicit Normal_type(std::string re, unsigned int f, std::string rep) :
-                       regex(re), flags(f), replacement(rep) {}
+  explicit Normal_type(std::string re, unsigned int f, std::string rep)
+      : regex(re), flags(f), replacement(rep)
+  {
+  }
   Normal_type(const struct Normal_type&) = default;
   Normal_type(struct Normal_type&&) = default;
   Normal_type& operator=(struct Normal_type&&) = default;
@@ -75,8 +77,9 @@ struct Normal_type {
  *  }
  */
 struct Normal_line {
-  Normal_line(std::string l, std::map<size_t, std::pair<int, size_t>>& secs) :
-              line(l), sections() {
+  Normal_line(std::string l, std::map<size_t, std::pair<int, size_t>>& secs)
+      : line(l), sections()
+  {
     std::swap(secs, sections);
   }
   std::string line;
@@ -109,117 +112,121 @@ class Line_normalizer {
 public:
   Line_normalizer() {}
 
- /*!
-  * \brief Provides a copy of the current set of Normal_types used for this
-  *        normalizer object.
-  *
-  * \code{.cpp}
-  * auto my_norm_types = norm.get_current_normal_types();
-  * \endcode
-  *
-  * \returns map of normal types where map key is the 'ID" for the normal_type
-  *          and the value is the Normal_type object.
-  */
-  const std::map<size_t, struct Normal_type> get_current_normal_types() const {
+  /*!
+   * \brief Provides a copy of the current set of Normal_types used for this
+   *        normalizer object.
+   *
+   * \code{.cpp}
+   * auto my_norm_types = norm.get_current_normal_types();
+   * \endcode
+   *
+   * \returns map of normal types where map key is the 'ID" for the normal_type
+   *          and the value is the Normal_type object.
+   */
+  const std::map<size_t, struct Normal_type> get_current_normal_types() const
+  {
     return normal_types;
   }
 
- /*!
-  * \brief Allows the user to set new Normal_types.
-  *
-  * \code{.cpp}
-  *  norm.modify_current_normal_types(1, new_normal_type);
-  * \endcode
-  *
-  * NOTE: The Normal_types contained in the normalizer are held in a map
-  *       where the key is considered the 'ID' for a particular Normal_type.
-  *       The public variable line_end_id is the key for the Normal_type
-  *       defining a line end in the input.  Changing the Normal_type
-  *       associated with line_end_id to something that does not identify a
-  *       line ending in the input will cause undefined behavior.  Also note,
-  *       normalization occurs in a hierarchy.  Normal_types with lower IDs
-  *       (ID's closer to zero) are given preference in any ties.  Thus,
-  *       Normal_types with higher IDs will only match if there are no
-  *       conflicts.  Further, longer matches are preferred over shorter.
-  *       Finally, it is expected that all regular expressions
-  *       used in the Normal_types will compile with hyperscan.
-  *
-  * \param nt_id The ID of the Normal_type to modify.
-  * \param nt A new Normal_type object.
-  */
-  void modify_current_normal_types(size_t nt_id, struct Normal_type nt) {
+  /*!
+   * \brief Allows the user to set new Normal_types.
+   *
+   * \code{.cpp}
+   *  norm.modify_current_normal_types(1, new_normal_type);
+   * \endcode
+   *
+   * NOTE: The Normal_types contained in the normalizer are held in a map
+   *       where the key is considered the 'ID' for a particular Normal_type.
+   *       The public variable line_end_id is the key for the Normal_type
+   *       defining a line end in the input.  Changing the Normal_type
+   *       associated with line_end_id to something that does not identify a
+   *       line ending in the input will cause undefined behavior.  Also note,
+   *       normalization occurs in a hierarchy.  Normal_types with lower IDs
+   *       (ID's closer to zero) are given preference in any ties.  Thus,
+   *       Normal_types with higher IDs will only match if there are no
+   *       conflicts.  Further, longer matches are preferred over shorter.
+   *       Finally, it is expected that all regular expressions
+   *       used in the Normal_types will compile with hyperscan.
+   *
+   * \param nt_id The ID of the Normal_type to modify.
+   * \param nt A new Normal_type object.
+   */
+  void modify_current_normal_types(size_t nt_id, struct Normal_type nt)
+  {
     normal_types[nt_id] = nt;
   }
 
- /*!
-  * \brief Parses the input stream until it can read no more characters and
-  *        then returns a vector of Normal_line objects where each object
-  *        represents one line parsed from the input stream.
-  *
-  * \code{.cpp}
-  *  my_norm_lines = norm.normalize(in);
-  * \endcode
-  *
-  *  \param in inputstream that will be read.  The caller is responsible for
-  *            managing the stream.
-  *
-  * \returns a vector of Normal_line objects.
-  */
+  /*!
+   * \brief Parses the input stream until it can read no more characters and
+   *        then returns a vector of Normal_line objects where each object
+   *        represents one line parsed from the input stream.
+   *
+   * \code{.cpp}
+   *  my_norm_lines = norm.normalize(in);
+   * \endcode
+   *
+   *  \param in inputstream that will be read.  The caller is responsible for
+   *            managing the stream.
+   *
+   * \returns a vector of Normal_line objects.
+   */
   std::vector<struct Normal_line> normalize(std::istream& in);
 
- /*!
-  * \brief The size of the number of characters (or bytes) processed at once.
-  */
+  /*!
+   * \brief The size of the number of characters (or bytes) processed at once.
+   */
   static constexpr size_t blocksize = 65536;
 
- /*!
-  * \brief The ID for the line_end Normal_type.
-  */
+  /*!
+   * \brief The ID for the line_end Normal_type.
+   */
   static constexpr size_t line_end_id = 0;
 
 private:
- /*!
-  * \brief build hyperscan database returns true on success / false otherwise.
-  */
+  /*!
+   * \brief build hyperscan database returns true on success / false otherwise.
+   */
   bool build_hs_database();
 
- /*!
-  * \brief Per match function used by hyperscan.
-  */
+  /*!
+   * \brief Per match function used by hyperscan.
+   */
   static int on_match(unsigned int id, unsigned long long start,
                       unsigned long long to, unsigned int, void* ctx);
 
- /*!
-  * \brief Reads a block of data from the inputstream and places it in block.
-  *        Returns number of characters read.
-  */
+  /*!
+   * \brief Reads a block of data from the inputstream and places it in block.
+   *        Returns number of characters read.
+   */
   size_t read_block(std::istream& in);
 
   // member variables.
   char block[blocksize] = {0};
   struct Line_context context;
   std::unique_ptr<hs_database_t, decltype(hs_free_database)*> hs_db{
-                  nullptr, &hs_free_database};
+      nullptr, &hs_free_database};
   std::map<size_t, struct Normal_type> normal_types = {
-    {line_end_id, Normal_type(R"(\n|\r\n)", 0u, "<NL>")},
-    {1, Normal_type(R"((((\d{1,2}|\d{4})[-\/\s](\d{1,2}|jan|feb|mar|)"
-                    R"(apr|may|jun|jul|aug|sep|oct|nov|dec)[-\/\s](\d{4}|)"
-                    R"(\d{1,2})|((jan(uary)?|feb(uary)?|mar(ch)?|apr(il)?|)"
-                    R"(may|jun(e)?|jul(y)?|aug(ust)?|sep(tember)?|)"
-                    R"(oct(ober)?|nov(ember)?|dec(ember)?)\s\s?\d{1,2})"
-                    R"((\s\d{4})?))([\s:]\d{2}[:]\d{2}[:]\d{2})"
-                    R"((\s(am|pm|[+-](\d{3,4}|\d{2}[:]\d{2})))?)?))",
-                    HS_FLAG_CASELESS, "<TS>")},
-    {2, Normal_type(R"(\d{1,3}[-.]\d{1,3}[-.]\d{1,3}[-.]\d{1,3}(\/\d{1,2})?)",
-                    0u, "<IP>")},
-    {3, Normal_type(R"(;base64,([0-9A-Za-z+/]{4}|[0-9A-Za-z+/]{3}=|)"
-                    R"([0-9A-Za-z+/]{2}==)+)", 0u, "<B64>")},
-    {4, Normal_type(R"((\x5c{1,2}x[0-9A-Fa-f]{2}|%[0-9A-Fa-f]{2}|)"
-                    R"([\x7f-\xff])+)", 0u, "<HEX>")},
-    {5, Normal_type(R"([v/]?\d{1,3}[._]\d{1,3}([._]\d{1,3})?\b)", 0u, "<VN>")},
-    {6, Normal_type(R"(\d+(\.\d+)?)", 0u, "<DEC>")}
-  };
+      {line_end_id, Normal_type(R"(\n|\r\n)", 0u, "<NL>")},
+      {1, Normal_type(R"((((\d{1,2}|\d{4})[-\/\s](\d{1,2}|jan|feb|mar|)"
+                      R"(apr|may|jun|jul|aug|sep|oct|nov|dec)[-\/\s](\d{4}|)"
+                      R"(\d{1,2})|((jan(uary)?|feb(uary)?|mar(ch)?|apr(il)?|)"
+                      R"(may|jun(e)?|jul(y)?|aug(ust)?|sep(tember)?|)"
+                      R"(oct(ober)?|nov(ember)?|dec(ember)?)\s\s?\d{1,2})"
+                      R"((\s\d{4})?))([\s:]\d{2}[:]\d{2}[:]\d{2})"
+                      R"((\s(am|pm|[+-](\d{3,4}|\d{2}[:]\d{2})))?)?))",
+                      HS_FLAG_CASELESS, "<TS>")},
+      {2, Normal_type(R"(\d{1,3}[-.]\d{1,3}[-.]\d{1,3}[-.]\d{1,3}(\/\d{1,2})?)",
+                      0u, "<IP>")},
+      {3, Normal_type(R"(;base64,([0-9A-Za-z+/]{4}|[0-9A-Za-z+/]{3}=|)"
+                      R"([0-9A-Za-z+/]{2}==)+)",
+                      0u, "<B64>")},
+      {4, Normal_type(R"((\x5c{1,2}x[0-9A-Fa-f]{2}|%[0-9A-Fa-f]{2}|)"
+                      R"([\x7f-\xff])+)",
+                      0u, "<HEX>")},
+      {5,
+       Normal_type(R"([v/]?\d{1,3}[._]\d{1,3}([._]\d{1,3})?\b)", 0u, "<VN>")},
+      {6, Normal_type(R"(\d+(\.\d+)?)", 0u, "<DEC>")}};
   std::unique_ptr<hs_scratch_t, decltype(hs_free_scratch)*> hs_scratch{
-                  nullptr, &hs_free_scratch};
+      nullptr, &hs_free_scratch};
 };
 #endif /*NORMALIZOR_H*/

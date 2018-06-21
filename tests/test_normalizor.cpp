@@ -10,7 +10,8 @@
 
 #include "normalizor.h"
 
-static void build_log_file(const std::string& fname, size_t total_lines) {
+static void build_log_file(const std::string& fname, size_t total_lines)
+{
   std::filebuf fb;
   fb.open(fname, std::ios_base::app | std::ios_base::out);
   std::ostream out(&fb);
@@ -28,7 +29,8 @@ static void build_log_file(const std::string& fname, size_t total_lines) {
   }
 }
 
-TEST (test_basic_normalization, test_normalize_lines) {
+TEST(test_basic_normalization, test_normalize_lines)
+{
   std::string my_log_file = "my_test.log";
   size_t total_lines = 10000;
   build_log_file(my_log_file, total_lines);
@@ -41,7 +43,8 @@ TEST (test_basic_normalization, test_normalize_lines) {
   remove(my_log_file.c_str());
 }
 
-TEST (test_basic_normaliztion, test_sections) {
+TEST(test_basic_normaliztion, test_sections)
+{
   std::string my_line = "12/31/1999 12:59:59 an ip 4.56.789.0 a"
                         ";base64,0A1B a hex \\x0b and a vn v1.2_3"
                         " a num 123 lala\n";
@@ -57,7 +60,8 @@ TEST (test_basic_normaliztion, test_sections) {
   }
 }
 
-TEST (test_basic_normalization, test_non_ascii) {
+TEST(test_basic_normalization, test_non_ascii)
+{
   std::string my_line("lala ησε lala ×ÀÃæ lala πεμας lala\n");
   Line_normalizer norm;
   std::istringstream in(my_line);

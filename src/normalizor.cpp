@@ -17,8 +17,8 @@
 
 #include "normalizor.h"
 
-
-bool Line_normalizer::build_hs_database() {
+bool Line_normalizer::build_hs_database()
+{
   hs_database_t* db = nullptr;
   hs_compile_error_t* err = nullptr;
   std::vector<const char*> regexes;
@@ -32,8 +32,8 @@ bool Line_normalizer::build_hs_database() {
   }
 
   if (hs_compile_multi(regexes.data(), flags.data(), ids.data(),
-                       static_cast<unsigned int>(regexes.size()),
-                       HS_MODE_BLOCK, nullptr, &db, &err) != HS_SUCCESS) {
+                       static_cast<unsigned int>(regexes.size()), HS_MODE_BLOCK,
+                       nullptr, &db, &err) != HS_SUCCESS) {
     hs_free_database(db);
     hs_free_compile_error(err);
     return false;
@@ -49,7 +49,8 @@ bool Line_normalizer::build_hs_database() {
   return true;
 }
 
-std::vector<Normal_line> Line_normalizer::normalize(std::istream& in) {
+std::vector<Normal_line> Line_normalizer::normalize(std::istream& in)
+{
   Line_context lines(block);
   if (!build_hs_database())
     return lines.parsed_lines;
@@ -86,8 +87,8 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
           ++sec_it;
         }
       }
-      ctx->parsed_lines.push_back(Normal_line(std::string(
-          &ctx->block[ctx->last_boundary], to - ctx->last_boundary),
+      ctx->parsed_lines.push_back(Normal_line(
+          std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary),
           ctx->cur_sections));
     }
     ctx->last_boundary = to;
@@ -97,28 +98,30 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
     auto start_it = ctx->cur_sections.find(relative_start);
     if (start_it == ctx->cur_sections.end() ||
         ctx->cur_sections[relative_start].second < relative_end ||
-        (ctx->cur_sections[relative_start].second == relative_end  &&
-         static_cast<unsigned int>(ctx->cur_sections[relative_start].first) > id))
-    {
+        (ctx->cur_sections[relative_start].second == relative_end &&
+         static_cast<unsigned int>(ctx->cur_sections[relative_start].first) >
+             id)) {
       ctx->cur_sections[relative_start] = std::make_tuple(id, relative_end);
     }
   }
   return 0;
 }
 
-size_t Line_normalizer::read_block(std::istream& in) {
+size_t Line_normalizer::read_block(std::istream& in)
+{
   in.read(block, blocksize);
   if (in.eof()) {
     return static_cast<size_t>(in.gcount());
   }
   if (!in)
-      return 0;
+    return 0;
 
   // walk stream back to last newline.
   long chars_read = static_cast<long>(in.gcount());
   long last_newline = chars_read;
-  for (; last_newline > 0 && block[last_newline - 1] != '\n'; --last_newline) {}
+  for (; last_newline > 0 && block[last_newline - 1] != '\n'; --last_newline) {
+  }
   in.seekg(static_cast<std::streamoff>(last_newline - chars_read),
-                                       std::ios_base::cur);
+           std::ios_base::cur);
   return static_cast<size_t>(last_newline);
 }

@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
   }
   struct stat file_stats;
   stat(log_file.c_str(), &file_stats);
-  double bytes_per_sec = static_cast<double>(file_stats.st_size) /
-                         total_proc_time;
+  double bytes_per_sec =
+      static_cast<double>(file_stats.st_size) / total_proc_time;
   size_t line_sum = 0.0;
   for (const auto& l : lines) {
     line_sum += l.line.size();
@@ -97,12 +97,14 @@ int main(int argc, char* argv[])
   std::cout << "\n";
   std::cout << "--Total lines processed: ";
   std::cout << std::to_string(lines.size()) << "\n";
-  std::cout << "--Lines per sec: " << std::to_string(
-               static_cast<double>(lines.size()) / total_proc_time) << "\n";
-  std::cout << "--Average Characters per Line: " <<
-            static_cast<double>(line_sum) /
-            static_cast<double>(lines.size()) << "\n";
-  std::cout << "--Bytes per sec: " <<
-                std::to_string(bytes_per_sec) << " (" << std::to_string(
-                bytes_per_sec / 1024.0 / 1024.0) << " MB per sec)\n";
+  std::cout << "--Lines per sec: "
+            << std::to_string(static_cast<double>(lines.size()) /
+                              total_proc_time)
+            << "\n";
+  std::cout << "--Average Characters per Line: "
+            << static_cast<double>(line_sum) / static_cast<double>(lines.size())
+            << "\n";
+  std::cout << "--Bytes per sec: " << std::to_string(bytes_per_sec) << " ("
+            << std::to_string(bytes_per_sec / 1024.0 / 1024.0)
+            << " MB per sec)\n";
 }

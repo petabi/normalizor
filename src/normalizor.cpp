@@ -49,21 +49,22 @@ bool Line_normalizer::build_hs_database()
   return true;
 }
 
-std::vector<Normal_line> Line_normalizer::normalize(std::istream& in)
+const std::vector<Normal_line>& Line_normalizer::normalize(std::istream& in)
 {
-  Line_context lines(block.data());
+  context.block = block.data();
+  context.parsed_lines.clear();
   if (!build_hs_database())
-    return lines.parsed_lines;
+    return context.parsed_lines;
   size_t char_read = read_block(in);
-  lines.parsed_lines.reserve(blocksize);
+  context.parsed_lines.reserve(blocksize);
   while (char_read > 0) {
-    lines.cur_sections.clear();
-    lines.last_boundary = 0;
+    context.cur_sections.clear();
+    context.last_boundary = 0;
     hs_scan(hs_db.get(), block.data(), static_cast<unsigned int>(char_read), 0,
-            hs_scratch.get(), on_match, static_cast<void*>(&lines));
+            hs_scratch.get(), on_match, static_cast<void*>(&context));
     char_read = read_block(in);
   }
-  return lines.parsed_lines;
+  return context.parsed_lines;
 }
 
 int Line_normalizer::on_match(unsigned int id, unsigned long long start,
@@ -87,14 +88,14 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
           ++sec_it;
         }
       }
-      ctx->parsed_lines.emplace_back(Normal_line(
+      ctx->parsed_lines.emplace_back(
           std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary),
-          ctx->cur_sections));
+          ctx->cur_sections);
     }
     ctx->last_boundary = to;
   } else {
-    size_t relative_start = static_cast<size_t>(start - ctx->last_boundary);
-    size_t relative_end = static_cast<size_t>(to - ctx->last_boundary);
+    auto relative_start = static_cast<size_t>(start - ctx->last_boundary);
+    auto relative_end = static_cast<size_t>(to - ctx->last_boundary);
     auto start_it = ctx->cur_sections.find(relative_start);
     if (start_it == ctx->cur_sections.end() ||
         ctx->cur_sections[relative_start].second < relative_end ||

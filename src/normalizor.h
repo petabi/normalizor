@@ -170,7 +170,7 @@ public:
    *
    * \returns a vector of Normal_line objects.
    */
-  std::vector<struct Normal_line> normalize(std::istream& in);
+  const std::vector<struct Normal_line>& normalize(std::istream& in);
 
   /*!
    * \brief The size of the number of characters (or bytes) processed at once.

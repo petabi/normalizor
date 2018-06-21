@@ -107,4 +107,5 @@ int main(int argc, char* argv[])
   std::cout << "--Bytes per sec: " << std::to_string(bytes_per_sec) << " ("
             << std::to_string(bytes_per_sec / 1024.0 / 1024.0)
             << " MB per sec)\n";
+  return EXIT_SUCCESS;
 }

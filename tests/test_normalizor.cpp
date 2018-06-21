@@ -1,10 +1,9 @@
-
+#include <ctime>
 #include <fstream>
 #include <istream>
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <time.h>
 
 #include <gtest/gtest.h>
 

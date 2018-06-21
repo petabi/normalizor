@@ -51,7 +51,7 @@ bool Line_normalizer::build_hs_database()
 
 std::vector<Normal_line> Line_normalizer::normalize(std::istream& in)
 {
-  Line_context lines(block);
+  Line_context lines(block.data());
   if (!build_hs_database())
     return lines.parsed_lines;
   size_t char_read = read_block(in);
@@ -59,7 +59,7 @@ std::vector<Normal_line> Line_normalizer::normalize(std::istream& in)
   while (char_read > 0) {
     lines.cur_sections.clear();
     lines.last_boundary = 0;
-    hs_scan(hs_db.get(), block, static_cast<unsigned int>(char_read), 0,
+    hs_scan(hs_db.get(), block.data(), static_cast<unsigned int>(char_read), 0,
             hs_scratch.get(), on_match, static_cast<void*>(&lines));
     char_read = read_block(in);
   }
@@ -70,7 +70,7 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
                               unsigned long long to, unsigned int,
                               void* scractch_ctx)
 {
-  struct Line_context* ctx = static_cast<struct Line_context*>(scractch_ctx);
+  auto ctx = static_cast<struct Line_context*>(scractch_ctx);
   if (id == line_end_id) {
     // Finished parsing a line, so need to build a Normal_line.
     if (!ctx->cur_sections.empty()) {
@@ -109,7 +109,7 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
 
 size_t Line_normalizer::read_block(std::istream& in)
 {
-  in.read(block, blocksize);
+  in.read(block.data(), blocksize);
   if (in.eof()) {
     return static_cast<size_t>(in.gcount());
   }
@@ -117,10 +117,10 @@ size_t Line_normalizer::read_block(std::istream& in)
     return 0;
 
   // walk stream back to last newline.
-  long chars_read = static_cast<long>(in.gcount());
+  long chars_read = in.gcount();
   long last_newline = chars_read;
-  for (; last_newline > 0 && block[last_newline - 1] != '\n'; --last_newline) {
-  }
+  for (; last_newline > 0 &&
+       block[static_cast<size_t>(last_newline - 1)] != '\n'; --last_newline) {}
   in.seekg(static_cast<std::streamoff>(last_newline - chars_read),
            std::ios_base::cur);
   return static_cast<size_t>(last_newline);

@@ -22,6 +22,7 @@
 #ifndef NORMALIZOR_H
 #define NORMALIZOR_H
 
+#include <array>
 #include <cstring>
 #include <istream>
 #include <map>
@@ -78,7 +79,7 @@ struct Normal_type {
  */
 struct Normal_line {
   Normal_line(std::string l, std::map<size_t, std::pair<int, size_t>>& secs)
-      : line(l), sections()
+      : line(std::move(l)), sections()
   {
     std::swap(secs, sections);
   }
@@ -200,7 +201,7 @@ private:
   size_t read_block(std::istream& in);
 
   // member variables.
-  char block[blocksize] = {0};
+  std::array<char, blocksize> block;
   struct Line_context context;
   std::unique_ptr<hs_database_t, decltype(hs_free_database)*> hs_db{
       nullptr, &hs_free_database};

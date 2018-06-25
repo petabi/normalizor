@@ -83,6 +83,7 @@ struct Normal_line {
   {
     std::swap(secs, sections);
   }
+
   std::string line;
   std::map<size_t, std::pair<int, size_t>> sections;
 };

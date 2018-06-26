@@ -9,5 +9,6 @@ include_directories(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 add_library(normalizor normalizor.cpp)
 target_link_libraries(normalizor Boost::filesystem ${HYPERSCAN_LIB})
 
-add_library(pynormalizor SHARED py_normalizor.cpp)
-target_link_libraries(pynormalizor normalizor ${PYTHON_LIBRARY} Boost::python36)
+add_library(py_normalizor MODULE py_normalizor.cpp)
+set_target_properties(py_normalizor PROPERTIES PREFIX "")
+target_link_libraries(py_normalizor normalizor ${PYTHON_LIBRARY} Boost::python36)

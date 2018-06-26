@@ -19,8 +19,17 @@ endif()
 
 include(GNUInstallDirs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-find_package(Boost REQUIRED filesystem program_options system python36)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options system python36)
+FIND_LIBRARY(PYTHON_LIBRARY python PATHS /opt/pkg/Library/Frameworks/ NO_DEFAULT_PATH)
+FIND_PATH(PYTHON_INCLUDE_DIRS python.h PATHS /opt/pkg/Library/Frameworks/Python.framework/Headers NO_DEFAULT_PATH)
 find_package(GTest)
+
+if (NOT PYTHON_LIBRARY)
+  FIND_LIBRARY(PYTHON_LIBRARY python)
+endif()
+if (NOT PYTHON_INCLUDE_DIRS)
+  FIND_PATH(PYTHON_INCLUDE_DIRS python.h)
+endif()
 
 subdirs(src)
 if(GTEST_FOUND)

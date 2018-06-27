@@ -5,6 +5,7 @@
  */
 
 #include <cstring>
+#include <fstream>
 #include <istream>
 #include <map>
 #include <string>
@@ -49,20 +50,20 @@ bool Line_normalizer::build_hs_database()
   return true;
 }
 
-const std::vector<Normal_line>& Line_normalizer::normalize(std::istream& in)
+const std::vector<Normal_line>& Line_normalizer::normalize()
 {
   context.block = block.data();
   context.parsed_lines.clear();
-  if (!build_hs_database())
+  if (!stream_to_normalize || !build_hs_database())
     return context.parsed_lines;
-  size_t char_read = read_block(in);
+  size_t char_read = read_block();
   context.parsed_lines.reserve(blocksize);
   while (char_read > 0) {
     context.cur_sections.clear();
     context.last_boundary = 0;
     hs_scan(hs_db.get(), block.data(), static_cast<unsigned int>(char_read), 0,
             hs_scratch.get(), on_match, static_cast<void*>(&context));
-    char_read = read_block(in);
+    char_read = read_block();
   }
   return context.parsed_lines;
 }
@@ -108,21 +109,33 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
   return 0;
 }
 
-size_t Line_normalizer::read_block(std::istream& in)
+size_t Line_normalizer::read_block()
 {
-  in.read(block.data(), blocksize);
-  if (in.eof()) {
-    return static_cast<size_t>(in.gcount());
+  if (!stream_to_normalize)
+    return 0;
+  stream_to_normalize->read(block.data(), blocksize);
+  if (stream_to_normalize->eof()) {
+    return static_cast<size_t>(stream_to_normalize->gcount());
   }
-  if (!in)
+  if (!stream_to_normalize)
     return 0;
 
   // walk stream back to last newline.
-  long chars_read = in.gcount();
+  long chars_read = stream_to_normalize->gcount();
   long last_newline = chars_read;
   for (; last_newline > 0 &&
        block[static_cast<size_t>(last_newline - 1)] != '\n'; --last_newline) {}
-  in.seekg(static_cast<std::streamoff>(last_newline - chars_read),
-           std::ios_base::cur);
+  stream_to_normalize->seekg(static_cast<std::streamoff>(
+                            last_newline - chars_read),
+                            std::ios_base::cur);
   return static_cast<size_t>(last_newline);
+}
+
+void Line_normalizer::set_input_stream(const std::string& stream) {
+  file_to_normalize.reset(new std::ifstream(stream, std::ios_base::in));
+  stream_to_normalize = static_cast<std::istream*>(file_to_normalize.get());
+}
+
+void Line_normalizer::set_input_stream(std::istream& stream) {
+  stream_to_normalize = &stream;
 }

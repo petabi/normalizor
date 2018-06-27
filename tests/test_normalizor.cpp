@@ -12,7 +12,7 @@
 static void build_log_file(const std::string& fname, size_t total_lines)
 {
   std::filebuf fb;
-  fb.open(fname, std::ios_base::app | std::ios_base::out);
+  fb.open(fname, std::ios_base::out);
   std::ostream out(&fb);
   std::string le = " This is my log entry ";
   time_t mytime;
@@ -34,10 +34,8 @@ TEST(test_basic_normalization, test_normalize_lines)
   size_t total_lines = 10000;
   build_log_file(my_log_file, total_lines);
   Line_normalizer norm;
-  std::filebuf fb;
-  fb.open(my_log_file, std::ios_base::in);
-  std::istream in(&fb);
-  auto lines = norm.normalize(in);
+  norm.set_input_stream(my_log_file);
+  auto lines = norm.normalize();
   EXPECT_EQ(lines.size(), total_lines);
   remove(my_log_file.c_str());
 }
@@ -49,7 +47,8 @@ TEST(test_basic_normaliztion, test_sections)
                         " a num 123 lala\n";
   Line_normalizer norm;
   std::istringstream in(my_line);
-  auto lines = norm.normalize(in);
+  norm.set_input_stream(in);
+  auto lines = norm.normalize();
   EXPECT_EQ(lines.front().sections.size(), 6);
   unsigned int sec_id = 1;
   auto sec_it = lines.front().sections.begin();
@@ -64,7 +63,8 @@ TEST(test_basic_normalization, test_non_ascii)
   std::string my_line("lala ησε lala ×ÀÃæ lala πεμας lala\n");
   Line_normalizer norm;
   std::istringstream in(my_line);
-  auto lines = norm.normalize(in);
+  norm.set_input_stream(in);
+  auto lines = norm.normalize();
   EXPECT_FALSE(lines.empty());
   EXPECT_EQ(lines.front().line, my_line);
   EXPECT_EQ(lines.front().sections.size(), 3);
@@ -75,4 +75,16 @@ TEST(test_basic_normalization, test_non_ascii)
       EXPECT_GT(static_cast<unsigned int>(c), 126);
     }
   }
+}
+
+TEST(test_basic_normalization, test_py_normalizor)
+{
+  std::string my_log_file = "my_test.log";
+  size_t total_lines = 10000;
+  std::string my_py_norm = DATA_DIR "/test_py_normalizor.py";
+  std::string my_cmd = "python3 " + my_py_norm + " " + LIB_DIR + " " + my_log_file;
+  build_log_file(my_log_file, total_lines);
+  int my_status_code = std::system(my_cmd.c_str());
+  EXPECT_GE(0, my_status_code);
+  remove(my_log_file.c_str());
 }

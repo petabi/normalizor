@@ -256,10 +256,15 @@ private:
   std::istream* stream_to_normalize = nullptr;
 };
 
+/*!
+ * \brief Need to provide comparison functions for Normal_line to facilitate
+ *        conversion to python.
+ */
 inline bool operator==(const struct Normal_line& lhs, const struct Normal_line& rhs) {
   return (lhs.line == rhs.line && lhs.sections == rhs.sections);
 }
 inline bool operator!=(const struct Normal_line& lhs, const struct Normal_line& rhs) {
   return !(lhs == rhs);
 }
+
 #endif /*NORMALIZOR_H*/

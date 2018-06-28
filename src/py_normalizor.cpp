@@ -19,17 +19,30 @@
 
 using namespace boost::python;
 
+/*! \brief This declares the python module.  The name must match the library
+ *  name exactly!
+ */
 BOOST_PYTHON_MODULE(py_normalizor) {
 
+  /*! \brief Provides a means to simplify function overloading.  In this case
+   *         This allows python to know which function to use given that
+   *         set_input_stream has two possible choices.
+   */
   void (Line_normalizer::*s1)(const std::string&) =
         &Line_normalizer::set_input_stream;
 
+  /*! \brief The following 2 classes are for facilitating conversion of data
+   *         types to and from python.  Both of these data types are typedefed
+   *         in normalizor.h.
+   */
   class_<Sections>("Sections")
       .def(map_indexing_suite<Sections>());
 
   class_<Normal_list>("Normal_list")
       .def(vector_indexing_suite<Normal_list>());
 
+  /*! \brief Exposes Normal_type to python.
+   */
   class_<Normal_type>("Normal_type", init<std::string, unsigned int,
                       std::string>())
       .def_readonly("regex", &Normal_type::regex)
@@ -37,12 +50,16 @@ BOOST_PYTHON_MODULE(py_normalizor) {
       .def_readonly("replacement", &Normal_type::replacement)
   ;
 
+  /*! \brief Exposes Normal_line to python.
+   */
   class_<Normal_line, boost::noncopyable>("Normal_line",
       init<std::string, Sections&>())
       .def_readonly("line", &Normal_line::line)
       .def_readonly("sections", &Normal_line::sections)
   ;
 
+  /*! \brief Exposes Line_normalizer to python.
+   */
   class_<Line_normalizer, boost::noncopyable>("Line_normalizer", init<>())
       .def("get_current_normal_types",
            &Line_normalizer::get_current_normal_types,

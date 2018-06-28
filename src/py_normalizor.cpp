@@ -5,21 +5,31 @@
  */
 
 #include <cstring>
-#include <istream>
 #include <map>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include <boost/python.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/make_constructor.hpp>
+#include <boost/python/suite/indexing/map_indexing_suite.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include "normalizor.h"
 
 using namespace boost::python;
 
 BOOST_PYTHON_MODULE(py_normalizor) {
+
+  void (Line_normalizer::*s1)(const std::string&) =
+        &Line_normalizer::set_input_stream;
+
+  class_<Sections>("Sections")
+      .def(map_indexing_suite<Sections>());
+
+  class_<Normal_list>("Normal_list")
+      .def(vector_indexing_suite<Normal_list>());
+
   class_<Normal_type>("Normal_type", init<std::string, unsigned int,
                       std::string>())
       .def_readonly("regex", &Normal_type::regex)
@@ -28,13 +38,10 @@ BOOST_PYTHON_MODULE(py_normalizor) {
   ;
 
   class_<Normal_line, boost::noncopyable>("Normal_line",
-      init<std::string, std::map<size_t, std::pair<int, size_t>>&>())
+      init<std::string, Sections&>())
       .def_readonly("line", &Normal_line::line)
       .def_readonly("sections", &Normal_line::sections)
   ;
-
-  void (Line_normalizer::*s1)(const std::string&) =
-        &Line_normalizer::set_input_stream;
 
   class_<Line_normalizer, boost::noncopyable>("Line_normalizer", init<>())
       .def("get_current_normal_types",

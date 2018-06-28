@@ -50,7 +50,7 @@ bool Line_normalizer::build_hs_database()
   return true;
 }
 
-const std::vector<Normal_line>& Line_normalizer::normalize()
+const Normal_list& Line_normalizer::normalize()
 {
   context.block = block.data();
   context.parsed_lines.clear();

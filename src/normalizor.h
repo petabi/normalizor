@@ -63,6 +63,8 @@ struct Normal_type {
   std::string replacement;
 };
 
+typedef std::map<size_t, std::pair<int, size_t>> Sections;
+
 /*!
  * \brief The Normal_line struct contains a single line of data as well as
  *        a data structure outlining all of the Normal_types in the line.
@@ -80,7 +82,7 @@ struct Normal_type {
  *  }
  */
 struct Normal_line {
-  Normal_line(std::string l, std::map<size_t, std::pair<int, size_t>>& secs)
+  Normal_line(std::string l, Sections& secs)
       : line(std::move(l)), sections()
   {
     std::swap(secs, sections);
@@ -92,8 +94,10 @@ struct Normal_line {
   ~Normal_line() = default;
 
   std::string line;
-  std::map<size_t, std::pair<int, size_t>> sections;
+  Sections sections;
 };
+
+typedef std::vector<struct Normal_line> Normal_list;
 
 /*!
  * \brief The Line_context is a structure used internally to facilitate the
@@ -104,8 +108,8 @@ struct Line_context {
   Line_context(const char* b) : block(b) {}
   const char* block;
   size_t last_boundary;
-  std::map<size_t, std::pair<int, size_t>> cur_sections;
-  std::vector<Normal_line> parsed_lines;
+  Sections cur_sections;
+  Normal_list parsed_lines;
 };
 
 /*!
@@ -181,7 +185,7 @@ public:
    *
    * \returns a vector of Normal_line objects.
    */
-  const std::vector<struct Normal_line>& normalize();
+  const Normal_list& normalize();
 
   /*!
    * \brief Designate the file, or stream, to normalize.  If stream assumes
@@ -251,4 +255,11 @@ private:
   std::unique_ptr<std::ifstream> file_to_normalize;
   std::istream* stream_to_normalize = nullptr;
 };
+
+inline bool operator==(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+  return (lhs.line == rhs.line && lhs.sections == rhs.sections);
+}
+inline bool operator!=(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+  return !(lhs == rhs);
+}
 #endif /*NORMALIZOR_H*/

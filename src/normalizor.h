@@ -123,12 +123,6 @@ struct Line_context {
  */
 class Line_normalizer {
 public:
-  Line_normalizer() = default;
-  Line_normalizer(const Line_normalizer&) = default;
-  Line_normalizer(Line_normalizer&&) = default;
-  Line_normalizer& operator=(Line_normalizer&&) = default;
-  Line_normalizer& operator=(const Line_normalizer&) = default;
-  ~Line_normalizer() = default;
 
   /*!
    * \brief Provides a copy of the current set of Normal_types used for this

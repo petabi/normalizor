@@ -24,6 +24,7 @@
 
 #include <array>
 #include <cstring>
+#include <fstream>
 #include <istream>
 #include <map>
 #include <string>
@@ -54,12 +55,15 @@ struct Normal_type {
   Normal_type(struct Normal_type&&) = default;
   Normal_type& operator=(struct Normal_type&&) = default;
   Normal_type& operator=(const struct Normal_type&) = default;
+  ~Normal_type() = default;
 
   std::string regex;
   unsigned int flags;
   char _padding[4];
   std::string replacement;
 };
+
+typedef std::map<size_t, std::pair<int, size_t>> Sections;
 
 /*!
  * \brief The Normal_line struct contains a single line of data as well as
@@ -78,14 +82,22 @@ struct Normal_type {
  *  }
  */
 struct Normal_line {
-  Normal_line(std::string l, std::map<size_t, std::pair<int, size_t>>& secs)
+  Normal_line(std::string l, Sections& secs)
       : line(std::move(l)), sections()
   {
     std::swap(secs, sections);
   }
+  Normal_line(const struct Normal_line&) = default;
+  Normal_line(struct Normal_line&&) = default;
+  Normal_line& operator=(struct Normal_line&&) = default;
+  Normal_line& operator=(const struct Normal_line&) = default;
+  ~Normal_line() = default;
+
   std::string line;
-  std::map<size_t, std::pair<int, size_t>> sections;
+  Sections sections;
 };
+
+typedef std::vector<struct Normal_line> Normal_list;
 
 /*!
  * \brief The Line_context is a structure used internally to facilitate the
@@ -96,8 +108,8 @@ struct Line_context {
   Line_context(const char* b) : block(b) {}
   const char* block;
   size_t last_boundary;
-  std::map<size_t, std::pair<int, size_t>> cur_sections;
-  std::vector<Normal_line> parsed_lines;
+  Sections cur_sections;
+  Normal_list parsed_lines;
 };
 
 /*!
@@ -165,12 +177,18 @@ public:
    *  my_norm_lines = norm.normalize(in);
    * \endcode
    *
-   *  \param in inputstream that will be read.  The caller is responsible for
-   *            managing the stream.
-   *
    * \returns a vector of Normal_line objects.
    */
-  const std::vector<struct Normal_line>& normalize(std::istream& in);
+  const Normal_list& normalize();
+
+  /*!
+   * \brief Designate the file, or stream, to normalize.  If stream assumes
+   *        the caller is responsible for the stream.
+   *
+   * \param stream filename or stream for normalizing.
+   */
+  void set_input_stream(const std::string& stream);
+  void set_input_stream(std::istream& stream);
 
   /*!
    * \brief The size of the number of characters (or bytes) processed at once.
@@ -198,7 +216,7 @@ private:
    * \brief Reads a block of data from the inputstream and places it in block.
    *        Returns number of characters read.
    */
-  size_t read_block(std::istream& in);
+  size_t read_block();
 
   // member variables.
   std::array<char, blocksize> block;
@@ -228,5 +246,19 @@ private:
       {6, Normal_type(R"(\d+(\.\d+)?)", 0u, "<DEC>")}};
   std::unique_ptr<hs_scratch_t, decltype(hs_free_scratch)*> hs_scratch{
       nullptr, &hs_free_scratch};
+  std::unique_ptr<std::ifstream> file_to_normalize;
+  std::istream* stream_to_normalize = nullptr;
 };
+
+/*!
+ * \brief Need to provide comparison functions for Normal_line to facilitate
+ *        conversion to python.
+ */
+inline bool operator==(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+  return (lhs.line == rhs.line && lhs.sections == rhs.sections);
+}
+inline bool operator!=(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+  return !(lhs == rhs);
+}
+
 #endif /*NORMALIZOR_H*/

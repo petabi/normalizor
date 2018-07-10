@@ -4,16 +4,11 @@
  * All rights reserved.
  */
 
-#include <cstring>
-#include <fstream>
 #include <iostream>
-#include <istream>
-#include <map>
 #include <string>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <tuple>
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -28,7 +23,6 @@ int main(int argc, char* argv[])
 {
   struct rusage start, end;
   Line_normalizer norm;
-  std::filebuf fb;
   std::vector<Normal_line> lines;
   std::string log_file;
   po::options_description posargs;
@@ -61,11 +55,9 @@ int main(int argc, char* argv[])
   if (args.count("profile")) {
     ProfilerStart("normalizer_profile.txt");
   }
+  norm.set_input_stream(log_file);
   getrusage(RUSAGE_SELF, &start);
-  if (fb.open(log_file.c_str(), std::ios_base::in)) {
-    std::istream in(&fb);
-    lines = norm.normalize(in);
-  }
+  lines = norm.normalize();
   getrusage(RUSAGE_SELF, &end);
   std::cout << "Normalization Complete!\n";
   if (args.count("profile")) {

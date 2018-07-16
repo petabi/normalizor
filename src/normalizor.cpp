@@ -103,7 +103,7 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
         (ctx->cur_sections[relative_start].second == relative_end &&
          static_cast<unsigned int>(ctx->cur_sections[relative_start].first) >
              id)) {
-      ctx->cur_sections[relative_start] = std::make_tuple(id, relative_end);
+      ctx->cur_sections[relative_start] = std::make_pair(id, relative_end);
     }
   }
   return 0;

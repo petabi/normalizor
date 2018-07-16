@@ -199,7 +199,7 @@ public:
   /*!
    * \brief The ID for the line_end Normal_type.
    */
-  static constexpr size_t line_end_id = 0;
+  static const size_t line_end_id;
 
 private:
   /*!

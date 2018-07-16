@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 project(normalizor VERSION 0.0.1 LANGUAGES CXX)
 
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
@@ -32,16 +32,8 @@ endif()
 include(GNUInstallDirs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options system python36)
-FIND_LIBRARY(PYTHON_LIBRARY python PATHS /opt/pkg/Library/Frameworks/ NO_DEFAULT_PATH)
-FIND_PATH(PYTHON_INCLUDE_DIRS Python.h PATHS /opt/pkg/Library/Frameworks/Python.framework/Headers NO_DEFAULT_PATH)
 find_package(GTest)
-
-if (NOT PYTHON_LIBRARY)
-  FIND_LIBRARY(PYTHON_LIBRARY python)
-endif()
-if (NOT PYTHON_INCLUDE_DIRS)
-  FIND_PATH(PYTHON_INCLUDE_DIRS python.h)
-endif()
+find_package(Python3 COMPONENTS Development REQUIRED)
 
 subdirs(src)
 if(GTEST_FOUND)

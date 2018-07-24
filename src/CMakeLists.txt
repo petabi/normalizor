@@ -12,5 +12,7 @@ if(HAVE_CXX_NO_MISSING_PROTOTYPES)
   target_compile_options(py_normalizor PRIVATE -Wno-missing-prototypes)
 endif()
 set_target_properties(py_normalizor PROPERTIES PREFIX "")
-target_link_libraries(py_normalizor
-  PRIVATE Python3::Python Boost::python36 Boost::filesystem ${HYPERSCAN_LIB})
+target_link_libraries(py_normalizor PRIVATE
+  Python3::Python
+  Boost::python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}
+  Boost::filesystem ${HYPERSCAN_LIB})

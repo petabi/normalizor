@@ -31,9 +31,10 @@ endif()
 
 include(GNUInstallDirs)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-find_package(Boost REQUIRED COMPONENTS filesystem program_options system python36)
-find_package(GTest)
 find_package(Python3 COMPONENTS Development REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options system
+  python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
+find_package(GTest)
 
 subdirs(src)
 if(GTEST_FOUND)

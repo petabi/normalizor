@@ -58,6 +58,20 @@ TEST(test_basic_normaliztion, test_sections)
   }
 }
 
+TEST(test_basic_normaliztion, test_sections2)
+{
+  std::string my_log_file = "my_test.log";
+  size_t total_lines = 10;
+  build_log_file(my_log_file, total_lines);
+  Line_normalizer norm;
+  norm.set_input_stream(my_log_file);
+  auto lines = norm.normalize();
+  EXPECT_EQ(lines.size(), 10);
+  for (const auto& nl : lines) {
+    EXPECT_EQ(nl.sections.size(), 2);
+  }
+}
+
 TEST(test_basic_normalization, test_non_ascii)
 {
   std::string my_line("lala ησε lala ×ÀÃæ lala πεμας lala\n");
@@ -82,9 +96,10 @@ TEST(test_basic_normalization, test_py_normalizor)
   std::string my_log_file = "my_test.log";
   size_t total_lines = 10000;
   std::string my_py_norm = DATA_DIR "/test_py_normalizor.py";
-  std::string my_cmd = "python3 " + my_py_norm + " " + LIB_DIR + " " + my_log_file;
+  std::string my_cmd =
+      "python3 " + my_py_norm + " " + LIB_DIR + " " + my_log_file;
   build_log_file(my_log_file, total_lines);
   int my_status_code = std::system(my_cmd.c_str());
-  EXPECT_EQ(0, my_status_code);
+  EXPECT_EQ(my_status_code, 0);
   remove(my_log_file.c_str());
 }

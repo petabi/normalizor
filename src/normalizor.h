@@ -83,8 +83,7 @@ typedef std::map<size_t, std::pair<int, size_t>> Sections;
  *  }
  */
 struct Normal_line {
-  Normal_line(std::string l, Sections& secs)
-      : line(std::move(l)), sections()
+  Normal_line(std::string l, Sections& secs) : line(std::move(l)), sections()
   {
     std::swap(secs, sections);
   }
@@ -124,7 +123,6 @@ struct Line_context {
  */
 class Line_normalizer {
 public:
-
   /*!
    * \brief Provides a copy of the current set of Normal_types used for this
    *        normalizer object.
@@ -255,10 +253,14 @@ private:
  * \brief Need to provide comparison functions for Normal_line to facilitate
  *        conversion to python.
  */
-inline bool operator==(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+inline bool operator==(const struct Normal_line& lhs,
+                       const struct Normal_line& rhs)
+{
   return (lhs.line == rhs.line && lhs.sections == rhs.sections);
 }
-inline bool operator!=(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+inline bool operator!=(const struct Normal_line& lhs,
+                       const struct Normal_line& rhs)
+{
   return !(lhs == rhs);
 }
 

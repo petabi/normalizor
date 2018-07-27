@@ -32,7 +32,6 @@
 #include <tuple>
 #include <vector>
 
-#include <boost/python.hpp>
 #include <hs/hs_common.h>
 #include <hs/hs_compile.h>
 #include <hs/hs_runtime.h>
@@ -84,8 +83,7 @@ typedef std::map<size_t, std::pair<int, size_t>> Sections;
  *  }
  */
 struct Normal_line {
-  Normal_line(std::string l, Sections& secs)
-      : line(std::move(l)), sections()
+  Normal_line(std::string l, Sections& secs) : line(std::move(l)), sections()
   {
     std::swap(secs, sections);
   }
@@ -125,7 +123,6 @@ struct Line_context {
  */
 class Line_normalizer {
 public:
-
   /*!
    * \brief Provides a copy of the current set of Normal_types used for this
    *        normalizer object.
@@ -256,32 +253,15 @@ private:
  * \brief Need to provide comparison functions for Normal_line to facilitate
  *        conversion to python.
  */
-inline bool operator==(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+inline bool operator==(const struct Normal_line& lhs,
+                       const struct Normal_line& rhs)
+{
   return (lhs.line == rhs.line && lhs.sections == rhs.sections);
 }
-inline bool operator!=(const struct Normal_line& lhs, const struct Normal_line& rhs) {
+inline bool operator!=(const struct Normal_line& lhs,
+                       const struct Normal_line& rhs)
+{
   return !(lhs == rhs);
 }
-
-template <typename T1, typename T2>
-struct std_pair_to_tuple
-{
-    static PyObject* convert(std::pair<T1,T2> const& p)
-    {
-        return boost::python::incref(
-        boost::python::make_tuple(p.first, p.second).ptr());
-    }
-};
-
-template <typename T1, typename T2>
-struct std_pair_to_python_converter
-{
-    std_pair_to_python_converter()
-    {
-        boost::python::to_python_converter<
-        std::pair<T1, T2>,
-        std_pair_to_tuple<T1, T2> >();
-    }
-};
 
 #endif /*NORMALIZOR_H*/

@@ -85,6 +85,6 @@ TEST(test_basic_normalization, test_py_normalizor)
   std::string my_cmd = "python3 " + my_py_norm + " " + LIB_DIR + " " + my_log_file;
   build_log_file(my_log_file, total_lines);
   int my_status_code = std::system(my_cmd.c_str());
-  EXPECT_GE(0, my_status_code);
+  EXPECT_EQ(0, my_status_code);
   remove(my_log_file.c_str());
 }

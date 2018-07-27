@@ -32,6 +32,7 @@
 #include <tuple>
 #include <vector>
 
+#include <boost/python.hpp>
 #include <hs/hs_common.h>
 #include <hs/hs_compile.h>
 #include <hs/hs_runtime.h>
@@ -261,5 +262,26 @@ inline bool operator==(const struct Normal_line& lhs, const struct Normal_line& 
 inline bool operator!=(const struct Normal_line& lhs, const struct Normal_line& rhs) {
   return !(lhs == rhs);
 }
+
+template <typename T1, typename T2>
+struct std_pair_to_tuple
+{
+    static PyObject* convert(std::pair<T1,T2> const& p)
+    {
+        return boost::python::incref(
+        boost::python::make_tuple(p.first, p.second).ptr());
+    }
+};
+
+template <typename T1, typename T2>
+struct std_pair_to_python_converter
+{
+    std_pair_to_python_converter()
+    {
+        boost::python::to_python_converter<
+        std::pair<T1, T2>,
+        std_pair_to_tuple<T1, T2> >();
+    }
+};
 
 #endif /*NORMALIZOR_H*/

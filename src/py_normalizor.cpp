@@ -14,6 +14,9 @@
 #include <boost/python/make_constructor.hpp>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <boost/python/module.hpp>
+#include <boost/python/tuple.hpp>
+#include <boost/python/to_python_converter.hpp>
 
 #include "normalizor.h"
 
@@ -23,6 +26,8 @@ using namespace boost::python;
  *  name exactly!
  */
 BOOST_PYTHON_MODULE(py_normalizor) {
+
+  std_pair_to_python_converter<int, size_t>();
 
   /*! \brief Provides a means to simplify function overloading.  In this case
    *         This allows python to know which function to use given that

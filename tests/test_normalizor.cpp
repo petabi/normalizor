@@ -49,12 +49,14 @@ TEST(test_basic_normaliztion, test_sections)
   std::istringstream in(my_line);
   norm.set_input_stream(in);
   auto lines = norm.normalize();
-  EXPECT_EQ(lines.front().sections.size(), 6);
-  unsigned int sec_id = 1;
+  EXPECT_EQ(lines.front().sections.size(), 21);
+  std::vector<int> sec_ids = {1, 7, 7, 7, 2, 7, 3, 7, 7, 7, 6,
+                              7, 7, 7, 7, 5, 7, 7, 7, 6, 7};
   auto sec_it = lines.front().sections.begin();
+  auto sec_id = sec_ids.begin();
   EXPECT_EQ(lines.front().line, my_line);
   for (; sec_it != lines.front().sections.end(); ++sec_id, ++sec_it) {
-    EXPECT_EQ(sec_id, sec_it->second.first);
+    EXPECT_EQ(*sec_id, sec_it->second.first);
   }
 }
 
@@ -68,7 +70,7 @@ TEST(test_basic_normaliztion, test_sections2)
   auto lines = norm.normalize();
   EXPECT_EQ(lines.size(), 10);
   for (const auto& nl : lines) {
-    EXPECT_EQ(nl.sections.size(), 2);
+    EXPECT_EQ(nl.sections.size(), 8);
   }
 }
 
@@ -83,10 +85,10 @@ TEST(test_basic_normalization, test_non_ascii)
   EXPECT_EQ(lines.front().line, my_line);
   EXPECT_EQ(lines.front().sections.size(), 3);
   for (const auto& s : lines.front().sections) {
-    EXPECT_EQ(s.second.first, 4);
+    EXPECT_EQ(s.second.first, 7);
     auto substr = my_line.substr(s.first, s.second.second - s.first);
     for (const auto& c : substr) {
-      EXPECT_GT(static_cast<unsigned int>(c), 126);
+      EXPECT_GT(static_cast<unsigned int>(c), 30);
     }
   }
 }

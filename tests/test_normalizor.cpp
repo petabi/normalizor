@@ -49,12 +49,14 @@ TEST(test_basic_normaliztion, test_sections)
   std::istringstream in(my_line);
   norm.set_input_stream(in);
   auto lines = norm.normalize();
-  EXPECT_EQ(lines.front().sections.size(), 6);
-  unsigned int sec_id = 1;
+  EXPECT_EQ(lines.front().sections.size(), 21);
+  std::vector<int> sec_ids = {1, 7, 7, 7, 2, 7, 3, 7, 7, 7, 6,
+                              7, 7, 7, 7, 5, 7, 7, 7, 6, 7};
   auto sec_it = lines.front().sections.begin();
+  auto sec_id = sec_ids.begin();
   EXPECT_EQ(lines.front().line, my_line);
   for (; sec_it != lines.front().sections.end(); ++sec_id, ++sec_it) {
-    EXPECT_EQ(sec_id, sec_it->second.first);
+    EXPECT_EQ(*sec_id, sec_it->second.first);
   }
 }
 
@@ -69,10 +71,10 @@ TEST(test_basic_normalization, test_non_ascii)
   EXPECT_EQ(lines.front().line, my_line);
   EXPECT_EQ(lines.front().sections.size(), 3);
   for (const auto& s : lines.front().sections) {
-    EXPECT_EQ(s.second.first, 4);
+    EXPECT_EQ(s.second.first, 7);
     auto substr = my_line.substr(s.first, s.second.second - s.first);
     for (const auto& c : substr) {
-      EXPECT_GT(static_cast<unsigned int>(c), 126);
+      EXPECT_GT(static_cast<unsigned int>(c), 30);
     }
   }
 }
@@ -82,7 +84,8 @@ TEST(test_basic_normalization, test_py_normalizor)
   std::string my_log_file = "my_test.log";
   size_t total_lines = 10000;
   std::string my_py_norm = DATA_DIR "/test_py_normalizor.py";
-  std::string my_cmd = "python3 " + my_py_norm + " " + LIB_DIR + " " + my_log_file;
+  std::string my_cmd =
+      "python3 " + my_py_norm + " " + LIB_DIR + " " + my_log_file;
   build_log_file(my_log_file, total_lines);
   int my_status_code = std::system(my_cmd.c_str());
   EXPECT_EQ(0, my_status_code);

@@ -70,7 +70,7 @@ TEST(test_basic_normaliztion, test_sections2)
   auto lines = norm.normalize();
   EXPECT_EQ(lines.size(), 10);
   for (const auto& nl : lines) {
-    EXPECT_EQ(nl.sections.size(), 2);
+    EXPECT_EQ(nl.sections.size(), 8);
   }
 }
 

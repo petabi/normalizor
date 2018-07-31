@@ -192,7 +192,7 @@ public:
   /*!
    * \brief The size of the number of characters (or bytes) processed at once.
    */
-  static constexpr size_t blocksize = 65536;
+  static const size_t blocksize = 65536;
 
   /*!
    * \brief The ID for the line_end Normal_type.

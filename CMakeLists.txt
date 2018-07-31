@@ -36,9 +36,9 @@ find_package(Boost REQUIRED COMPONENTS filesystem program_options system
   python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
 find_package(GTest)
 
-subdirs(src)
+add_subdirectory(src)
 if(GTEST_FOUND)
   enable_testing()
-  subdirs(tests)
+  add_subdirectory(tests)
 endif()
-subdirs(tools)
+add_subdirectory(tools)

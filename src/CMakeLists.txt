@@ -1,10 +1,11 @@
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-Wno-missing-prototypes HAVE_CXX_NO_MISSING_PROTOTYPES)
 
-find_library(HYPERSCAN_LIB hs ${CMAKE_INSTALL_PREFIX}/lib)
+include(FindPkgConfig)
+pkg_check_modules(libhs REQUIRED IMPORTED_TARGET libhs)
 
 add_library(normalizor normalizor.cpp)
-target_link_libraries(normalizor PUBLIC ${HYPERSCAN_LIB})
+target_link_libraries(normalizor PUBLIC PkgConfig::libhs)
 target_link_libraries(normalizor PRIVATE Boost::filesystem)
 
 add_library(py_normalizor MODULE py_normalizor.cpp normalizor.cpp)
@@ -15,4 +16,4 @@ set_target_properties(py_normalizor PROPERTIES PREFIX "")
 target_link_libraries(py_normalizor PRIVATE
   Python3::Python
   Boost::python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}
-  Boost::filesystem ${HYPERSCAN_LIB})
+  Boost::filesystem PkgConfig::libhs)

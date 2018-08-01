@@ -101,6 +101,5 @@ BOOST_PYTHON_MODULE(py_normalizor)
       .def("normalize", &Line_normalizer::normalize,
            return_value_policy<copy_const_reference>())
       .def("set_input_stream", s1)
-      .def_readonly("blocksize", &Line_normalizer::blocksize)
       .def_readonly("line_end_id", &Line_normalizer::line_end_id);
 }

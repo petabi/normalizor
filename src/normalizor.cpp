@@ -19,7 +19,6 @@
 #include "normalizor.h"
 
 const size_t Line_normalizer::line_end_id = 0;
-const size_t Line_normalizer::blocksize;
 
 bool Line_normalizer::build_hs_database()
 {

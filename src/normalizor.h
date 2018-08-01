@@ -37,6 +37,11 @@
 #include <hs/hs_runtime.h>
 
 /*!
+ * \brief The size of the number of characters (or bytes) processed at once.
+ */
+constexpr size_t blocksize = 65536;
+
+/*!
  * \brief The Normal_type is a structure for storing the data used to identify
  *        sections in an line.
  *
@@ -188,11 +193,6 @@ public:
    */
   void set_input_stream(const std::string& stream);
   void set_input_stream(std::istream& stream);
-
-  /*!
-   * \brief The size of the number of characters (or bytes) processed at once.
-   */
-  static const size_t blocksize = 65536;
 
   /*!
    * \brief The ID for the line_end Normal_type.

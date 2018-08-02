@@ -55,7 +55,7 @@ PyObject* section2dict(Sections& section)
 /*! \brief This declares the python module.  The name must match the library
  *  name exactly!
  */
-BOOST_PYTHON_MODULE(py_normalizor)
+BOOST_PYTHON_MODULE(normalizor)
 {
   def("section2dict", section2dict);
   std_pair_to_python_converter<int, size_t>();

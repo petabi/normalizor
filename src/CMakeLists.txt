@@ -9,6 +9,8 @@ target_link_libraries(normalizor PUBLIC PkgConfig::libhs)
 target_link_libraries(normalizor PRIVATE Boost::filesystem)
 
 add_library(py_normalizor MODULE py_normalizor.cpp normalizor.cpp)
+set_target_properties(py_normalizor PROPERTIES
+  OUTPUT_NAME "normalizor")
 if(HAVE_CXX_NO_MISSING_PROTOTYPES)
   target_compile_options(py_normalizor PRIVATE -Wno-missing-prototypes)
 endif()

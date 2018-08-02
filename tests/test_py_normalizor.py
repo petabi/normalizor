@@ -5,7 +5,7 @@ def main():
     libdir = sys.argv[1]
     filename = sys.argv[2]
     sys.path.insert(0, libdir)
-    import py_normalizor as norm
+    import normalizor as norm
     myln = norm.Line_normalizer()
     myln.set_input_stream(filename)
     mylines = myln.normalize()

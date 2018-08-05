@@ -1,4 +1,6 @@
-# I. Overview
+# Normalizor
+
+## Overview
 
 Normalizor is a simple library to apply high-speed regular
 expression matching against a textual input and to `normalize'
@@ -18,7 +20,7 @@ Finally, Normalizor offers python bindings so that it can be used
 in Python.  The goal is to aid in the parsing of huge log files
 where parsing line-by-line can take minutes or hours.
 
-# II. Caveats and Known Issues
+## Caveats and Known Issues
 
 * The performance of Normalizor depends on two things:
   1. The number and complexity of Regular Expressions (more regex == more effort).
@@ -27,7 +29,7 @@ where parsing line-by-line can take minutes or hours.
   It will define lines by this character.  If the input has no newline chars it will be treated
   as one big line (which may be problematic).
   
-# III. Requirements
+## Requirements
 
 Normalizor uses hyperscan for fast and efficient regular
 expression matching.  Normalizor also uses boost, googletest,
@@ -41,11 +43,11 @@ and Python3.
 * cmake
 * google profiler (for testing--optional)
 
-# IV. API
+## API
 
 Normalizor relies on a couple of structures.
 
-## Normal_line
+### Normal_line
 
 The Normal_line structure holds the results of normalization.  It is comprised of the
 following:
@@ -55,7 +57,7 @@ std::string line;  # The original line
 Sections sections; # The indexes for matches found
 ```
 
-## Sections
+### Sections
 
 The Sections struct is used to manage the matching regions within a line.
 All offsets are from the beginnig of the referenced line (i.e. original line in the
@@ -71,7 +73,7 @@ std::map<size_t, std::pair<int, size_t>>
 
 Use this data to find the regions and the types of those regions (i.e. what it matched to).
 
-## Normal_type
+### Normal_type
 
 The Normal_type represents the types of interest.  There is a default set to be explained
 later.  This set can be changed, but must be set prior to normalization.  The Normal_type
@@ -89,9 +91,9 @@ for the default values.  The Normal_type are kept in a std::map within normalizo
 The key for each type is the ID for that Normal_type.  Note that the ID 0 must always
 refer to the line ending.  If it does not, then that is undefined behavior.
 
-# V. Usage
+## Usage
 
-## C++ Usage
+### C++ Usage
 
 Normalizor uses a default constructor.  So, to create a normalizor object please just
 use something like:
@@ -130,7 +132,7 @@ When everything is ready to go please use the following:
 auto lines = ln.normalize();
 ```
 
-## Python Usage
+### Python Usage
 
 ```
 import py_normalizor as norm
@@ -139,7 +141,7 @@ myln.set_input_stream(filename)
 mylines = myln.normalize()
 ```
 
-## Command Line tool: testor
+### Command Line tool: testor
 
 The command line tool for normalizor is called testor.
 It is mostly designed to provide statistics for reading files, but may offer some example

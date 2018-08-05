@@ -1,8 +1,10 @@
 enable_testing()
 include(GoogleTest)
-add_definitions(-DDATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
-add_definitions(-DLIB_DIR="${CMAKE_BINARY_DIR}/src")
+
 add_executable(test_normalizor test_normalizor.cpp)
+target_compile_definitions(test_normalizor PRIVATE
+  -DDATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+  -DLIB_DIR="${CMAKE_BINARY_DIR}/src")
 target_compile_options(test_normalizor PRIVATE -Wno-global-constructors)
 target_include_directories(test_normalizor PUBLIC ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src)

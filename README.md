@@ -1,7 +1,5 @@
 # Normalizor
 
-## Overview
-
 Normalizor is a simple library to apply high-speed regular
 expression matching against a textual input and to `normalize'
 that input by identifying regions that meet certain regular

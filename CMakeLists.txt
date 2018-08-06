@@ -36,8 +36,17 @@ find_package(Boost REQUIRED COMPONENTS filesystem program_options system
   python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
 find_package(GTest)
 
+# Workaround for https://bugs.llvm.org/show_bug.cgi?id=33771
+set_target_properties(
+  Boost::python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR} PROPERTIES
+  INTERFACE_COMPILE_OPTIONS -Wno-zero-as-null-pointer-constant)
+
 add_subdirectory(src)
 if(GTEST_FOUND)
+  # Workaround for https://bugs.llvm.org/show_bug.cgi?id=33771
+  set_target_properties(GTest::GTest PROPERTIES
+    INTERFACE_COMPILE_OPTIONS -Wno-zero-as-null-pointer-constant)
+
   enable_testing()
   add_subdirectory(tests)
 endif()

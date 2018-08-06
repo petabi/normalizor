@@ -52,7 +52,7 @@ constexpr size_t blocksize = 65536;
  * section.
  */
 struct Normal_type {
-  Normal_type() : regex(), flags(0), replacement() {}
+  Normal_type() : regex(), replacement() {}
   explicit Normal_type(std::string re, unsigned int f, std::string rep)
       : regex(std::move(re)), flags(f), replacement(std::move(rep))
   {
@@ -64,12 +64,12 @@ struct Normal_type {
   ~Normal_type() = default;
 
   std::string regex;
-  unsigned int flags;
+  unsigned int flags{0};
   char _padding[4];
   std::string replacement;
 };
 
-typedef std::map<size_t, std::pair<int, size_t>> Sections;
+using Sections = std::map<size_t, std::pair<int, size_t>>;
 
 /*!
  * \brief The Normal_line struct contains a single line of data as well as
@@ -102,17 +102,17 @@ struct Normal_line {
   Sections sections;
 };
 
-typedef std::vector<struct Normal_line> Normal_list;
+using Normal_list = std::vector<struct Normal_line>;
 
 /*!
  * \brief The Line_context is a structure used internally to facilitate the
  *        identification of lines and sections.
  */
 struct Line_context {
-  Line_context() : block(nullptr), last_boundary(0) {}
+  Line_context() = default;
   Line_context(const char* b) : block(b) {}
-  const char* block;
-  size_t last_boundary;
+  const char* block{nullptr};
+  size_t last_boundary{0};
   Sections cur_sections;
   Normal_list parsed_lines;
 };

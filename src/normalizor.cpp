@@ -8,6 +8,7 @@
 #include <fstream>
 #include <istream>
 #include <map>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -139,7 +140,8 @@ size_t Line_normalizer::read_block()
 
 void Line_normalizer::set_input_stream(const std::string& stream)
 {
-  file_to_normalize.reset(new std::ifstream(stream, std::ios_base::in));
+  file_to_normalize =
+      std::make_unique<std::ifstream>(stream, std::ios_base::in);
   stream_to_normalize = static_cast<std::istream*>(file_to_normalize.get());
 }
 

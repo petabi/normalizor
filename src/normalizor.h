@@ -93,7 +93,7 @@ struct Normal_line {
     std::swap(secs, sections);
   }
   Normal_line(const struct Normal_line&) = default;
-  Normal_line(struct Normal_line&&) = default;
+  Normal_line(struct Normal_line&&) noexcept = default;
   Normal_line& operator=(struct Normal_line&&) = default;
   Normal_line& operator=(const struct Normal_line&) = default;
   ~Normal_line() = default;

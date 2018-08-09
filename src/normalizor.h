@@ -58,14 +58,14 @@ struct Normal_type {
   {
   }
   Normal_type(const struct Normal_type&) = default;
-  Normal_type(struct Normal_type&&) = default;
-  Normal_type& operator=(struct Normal_type&&) = default;
+  Normal_type(struct Normal_type&&) noexcept(true) = default;
+  Normal_type& operator=(struct Normal_type&&) noexcept(true) = default;
   Normal_type& operator=(const struct Normal_type&) = default;
-  ~Normal_type() = default;
+  ~Normal_type() noexcept(true) = default;
 
   std::string regex;
   unsigned int flags{0};
-  char _padding[4];
+  char _padding[4]{0};
   std::string replacement;
 };
 
@@ -93,10 +93,10 @@ struct Normal_line {
     std::swap(secs, sections);
   }
   Normal_line(const struct Normal_line&) = default;
-  Normal_line(struct Normal_line&&) = default;
-  Normal_line& operator=(struct Normal_line&&) = default;
+  Normal_line(struct Normal_line&&) noexcept(true) = default;
+  Normal_line& operator=(struct Normal_line&&) noexcept(true) = default;
   Normal_line& operator=(const struct Normal_line&) = default;
-  ~Normal_line() = default;
+  ~Normal_line() noexcept(true) = default;
 
   std::string line;
   Sections sections;

@@ -80,10 +80,20 @@ int main(int argc, char* argv[])
   stat(log_file.c_str(), &file_stats);
   double bytes_per_sec =
       static_cast<double>(file_stats.st_size) / total_proc_time;
+  size_t size_of_nlines = 0;
   size_t line_sum = 0.0;
   for (const auto& l : lines) {
     line_sum += l.line.size();
+    size_of_nlines += l.line.size() + (l.sections.size() * 32);
   }
+  double rss_mb = static_cast<double>(end.ru_maxrss) / 1024.0 / 1024.0;
+  double expected_mb = static_cast<double>(size_of_nlines) / 1024.0 / 1024.0;
+  std::cout << "Memory Statistics:\n";
+  std::cout << "--Max rss: " << std::to_string(end.ru_maxrss) << " ("
+            << std::to_string(rss_mb) << "MB)\n";
+  std::cout << "--Estimated size of Normal_lines: "
+            << std::to_string(size_of_nlines) << " ("
+            << std::to_string(expected_mb) << "MB)\n";
   std::cout << "Processing Statistics\n";
   std::cout << "--Total time to process: " << std::to_string(total_proc_time);
   std::cout << "\n";

@@ -65,7 +65,7 @@ struct Normal_type {
 
   std::string regex;
   unsigned int flags{0};
-  char _padding[4];
+  char _padding[4]{0};
   std::string replacement;
 };
 

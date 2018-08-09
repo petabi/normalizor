@@ -58,7 +58,7 @@ struct Normal_type {
   {
   }
   Normal_type(const struct Normal_type&) = default;
-  Normal_type(struct Normal_type&&) = default;
+  Normal_type(struct Normal_type&&) noexcept = default;
   Normal_type& operator=(struct Normal_type&&) = default;
   Normal_type& operator=(const struct Normal_type&) = default;
   ~Normal_type() = default;

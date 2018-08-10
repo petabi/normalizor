@@ -35,8 +35,13 @@ TEST(test_basic_normalization, test_normalize_lines)
   build_log_file(my_log_file, total_lines);
   Line_normalizer norm;
   norm.set_input_stream(my_log_file);
-  auto lines = norm.normalize();
-  EXPECT_EQ(lines.size(), total_lines);
+  auto lines = norm.get_normalized_block();
+  size_t line_count = 0;
+  while (!lines.empty()) {
+    line_count += lines.size();
+    lines = norm.get_normalized_block();
+  }
+  EXPECT_EQ(line_count, total_lines);
   remove(my_log_file.c_str());
 }
 
@@ -48,7 +53,8 @@ TEST(test_basic_normaliztion, test_sections)
   Line_normalizer norm;
   std::istringstream in(my_line);
   norm.set_input_stream(in);
-  auto lines = norm.normalize();
+  auto lines = norm.get_normalized_block();
+  EXPECT_EQ(lines.empty(), false);
   EXPECT_EQ(lines.front().sections.size(), 21);
   std::vector<int> sec_ids = {1, 7, 7, 7, 2, 7, 3, 7, 7, 7, 6,
                               7, 7, 7, 7, 5, 7, 7, 7, 6, 7};
@@ -67,7 +73,7 @@ TEST(test_basic_normaliztion, test_sections2)
   build_log_file(my_log_file, total_lines);
   Line_normalizer norm;
   norm.set_input_stream(my_log_file);
-  auto lines = norm.normalize();
+  auto lines = norm.get_normalized_block();
   EXPECT_EQ(lines.size(), 10);
   for (const auto& nl : lines) {
     EXPECT_EQ(nl.sections.size(), 8);
@@ -80,7 +86,7 @@ TEST(test_basic_normalization, test_non_ascii)
   Line_normalizer norm;
   std::istringstream in(my_line);
   norm.set_input_stream(in);
-  auto lines = norm.normalize();
+  auto lines = norm.get_normalized_block();
   EXPECT_FALSE(lines.empty());
   EXPECT_EQ(lines.front().line, my_line);
   EXPECT_EQ(lines.front().sections.size(), 3);

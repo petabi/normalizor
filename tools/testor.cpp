@@ -56,8 +56,21 @@ int main(int argc, char* argv[])
     ProfilerStart("normalizer_profile.txt");
   }
   norm.set_input_stream(log_file);
+  size_t line_count = 0;
+  size_t line_blocks = 0;
   getrusage(RUSAGE_SELF, &start);
-  lines = norm.normalize();
+  lines = norm.get_normalized_block();
+  while (!lines.empty()) {
+    if (args.count("debug")) {
+      std::cout << "Printing Debug information\n";
+      for (const auto& l : lines) {
+        std::cout << l.line.c_str();
+      }
+    }
+    line_count += lines.size();
+    ++line_blocks;
+    lines = norm.get_normalized_block();
+  }
   getrusage(RUSAGE_SELF, &end);
   std::cout << "Normalization Complete!\n";
   if (args.count("profile")) {
@@ -70,42 +83,31 @@ int main(int argc, char* argv[])
   timeradd(&total, &diff, &total);
   double total_proc_time = static_cast<double>(total.tv_sec) +
                            (static_cast<double>(total.tv_usec) / 1000000.0);
-  if (args.count("debug")) {
-    std::cout << "Printing Debug information\n";
-    for (const auto& l : lines) {
-      std::cout << l.line.c_str();
-    }
-  }
   struct stat file_stats;
   stat(log_file.c_str(), &file_stats);
   double bytes_per_sec =
       static_cast<double>(file_stats.st_size) / total_proc_time;
-  size_t size_of_nlines = 0;
-  size_t line_sum = 0.0;
-  for (const auto& l : lines) {
-    line_sum += l.line.size();
-    size_of_nlines += l.line.size() + (l.sections.size() * 32);
-  }
+  double avg_lines_per_block =
+      static_cast<double>(line_count) / static_cast<double>(line_blocks);
+  double avg_bytes_per_line =
+      static_cast<double>(file_stats.st_size) / static_cast<double>(line_count);
   double rss_mb = static_cast<double>(end.ru_maxrss) / 1024.0 / 1024.0;
-  double expected_mb = static_cast<double>(size_of_nlines) / 1024.0 / 1024.0;
+
   std::cout << "Memory Statistics:\n";
   std::cout << "--Max rss: " << std::to_string(end.ru_maxrss) << " ("
-            << std::to_string(rss_mb) << "MB)\n";
-  std::cout << "--Estimated size of Normal_lines: "
-            << std::to_string(size_of_nlines) << " ("
-            << std::to_string(expected_mb) << "MB)\n";
+            << std::to_string(rss_mb) << " MB)\n";
   std::cout << "Processing Statistics\n";
   std::cout << "--Total time to process: " << std::to_string(total_proc_time);
   std::cout << "\n";
   std::cout << "--Total lines processed: ";
-  std::cout << std::to_string(lines.size()) << "\n";
+  std::cout << std::to_string(line_count) << "\n";
   std::cout << "--Lines per sec: "
-            << std::to_string(static_cast<double>(lines.size()) /
-                              total_proc_time)
+            << std::to_string(static_cast<double>(line_count) / total_proc_time)
             << "\n";
-  std::cout << "--Average Characters per Line: "
-            << static_cast<double>(line_sum) / static_cast<double>(lines.size())
-            << "\n";
+  std::cout << "--Average Bytes per Line: "
+            << std::to_string(avg_bytes_per_line) << "\n";
+  std::cout << "--Average Lines per Block: "
+            << std::to_string(avg_lines_per_block) << "\n";
   std::cout << "--Bytes per sec: " << std::to_string(bytes_per_sec) << " ("
             << std::to_string(bytes_per_sec / 1024.0 / 1024.0)
             << " MB per sec)\n";

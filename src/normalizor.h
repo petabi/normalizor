@@ -38,8 +38,17 @@
 
 /*!
  * \brief The size of the number of characters (or bytes) processed at once.
+ * This size was chosen after some tests on the local machine as offering
+ * the best performance to memory usage.
  */
-constexpr size_t blocksize = 65536;
+constexpr size_t blocksize = 2097152;
+
+/*!
+ * \brief Most log entries we have seen are 100 or more chars long.  That would
+ * make roughly 21k lines per block.  32k lines gives us room before any need
+ * to grow.
+ */
+constexpr size_t base_lines = 32768;
 
 /*!
  * \brief The Normal_type is a structure for storing the data used to identify
@@ -128,6 +137,11 @@ struct Line_context {
  */
 class Line_normalizer {
 public:
+  Line_normalizer()
+  {
+    context.parsed_lines.reserve(base_lines);
+    build_hs_database();
+  }
   /*!
    * \brief Provides a copy of the current set of Normal_types used for this
    *        normalizer object.
@@ -170,20 +184,27 @@ public:
   void modify_current_normal_types(size_t nt_id, struct Normal_type nt)
   {
     normal_types[nt_id] = std::move(nt);
+    build_hs_database();
   }
 
   /*!
-   * \brief Parses the input stream until it can read no more characters and
-   *        then returns a vector of Normal_line objects where each object
-   *        represents one line parsed from the input stream.
+   * \brief Parses one block of the input stream and returns a vector of normal
+   * lines for that sub set (block) of the input stream.  Continue to call
+   * this function until it returns an empty vector.  The empty vector
+   * indicates the end of the input.
    *
    * \code{.cpp}
-   *  my_norm_lines = norm.normalize(in);
+   *  my_normal_lines = norm.get_normalized_block();
+   *  while (!my_normal_lines.empty()) {
+   *     ... do something ...
+   *    my_normal_lines = norm.get_normalized_block();
+   *  }
    * \endcode
    *
-   * \returns a vector of Normal_line objects.
+   * \returns a vector of Normal_line objects or an empty list if the input
+   * has been exhaused (all lines consumed).
    */
-  const Normal_list& normalize();
+  const Normal_list& get_normalized_block();
 
   /*!
    * \brief Designate the file, or stream, to normalize.  If stream assumes

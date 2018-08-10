@@ -98,7 +98,7 @@ BOOST_PYTHON_MODULE(normalizor)
            return_value_policy<reference_existing_object>())
       .def("modify_current_normal_types",
            &Line_normalizer::modify_current_normal_types)
-      .def("normalize", &Line_normalizer::normalize,
+      .def("get_normalized_block", &Line_normalizer::get_normalized_block,
            return_value_policy<copy_const_reference>())
       .def("set_input_stream", s1)
       .def_readonly("line_end_id", &Line_normalizer::line_end_id);

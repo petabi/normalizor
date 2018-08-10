@@ -53,21 +53,19 @@ bool Line_normalizer::build_hs_database()
   return true;
 }
 
-const Normal_list& Line_normalizer::normalize()
+const Normal_list& Line_normalizer::get_normalized_block()
 {
   context.block = block.data();
   context.parsed_lines.clear();
+  context.cur_sections.clear();
+  context.last_boundary = 0;
   if (!stream_to_normalize || !build_hs_database())
     return context.parsed_lines;
   size_t char_read = read_block();
-  context.parsed_lines.reserve(blocksize);
-  while (char_read > 0) {
-    context.cur_sections.clear();
-    context.last_boundary = 0;
-    hs_scan(hs_db.get(), block.data(), static_cast<unsigned int>(char_read), 0,
-            hs_scratch.get(), on_match, static_cast<void*>(&context));
-    char_read = read_block();
-  }
+  if (char_read == 0)
+    return context.parsed_lines;
+  hs_scan(hs_db.get(), block.data(), static_cast<unsigned int>(char_read), 0,
+          hs_scratch.get(), on_match, static_cast<void*>(&context));
   return context.parsed_lines;
 }
 

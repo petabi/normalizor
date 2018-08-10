@@ -8,7 +8,7 @@ def main():
     import normalizor as norm
     myln = norm.Line_normalizer()
     myln.set_input_stream(filename)
-    mylines = myln.normalize()
+    mylines = myln.get_normalized_block()
     for l in mylines:
         if len(l.sections) == 0:
             return 1

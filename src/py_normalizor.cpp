@@ -12,8 +12,10 @@
 #include <boost/python.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/dict.hpp>
+#include <boost/python/handle.hpp>
 #include <boost/python/make_constructor.hpp>
 #include <boost/python/module.hpp>
+#include <boost/python/object.hpp>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/to_python_converter.hpp>
@@ -52,12 +54,25 @@ PyObject* section2dict(Sections& section)
   return boost::python::incref(x.ptr());
 }
 
+boost::python::object str2bytes(std::string& data)
+{
+Py_buffer buffer;
+dataSize = data.length();
+int res = PyBuffer_FillInfo(&buffer, 0, data, dataSize, true, PyBUF_CONTIG_RO);
+if (res == -1) {
+    PyErr_Print();
+    exit(EXIT_FAILURE);
+       }
+    boost::python::object memoryView(boost::python::handle<>(PyMemoryView_FromMemory(data, dataSize, PyBUF_READ)));
+    return memoryView;
+}
 /*! \brief This declares the python module.  The name must match the library
  *  name exactly!
  */
 BOOST_PYTHON_MODULE(normalizor)
 {
   def("section2dict", section2dict);
+  def("str2bytes", str2bytes);
   std_pair_to_python_converter<int, size_t>();
 
   /*! \brief Provides a means to simplify function overloading.  In this case

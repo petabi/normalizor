@@ -264,7 +264,8 @@ private:
       {5,
        Normal_type(R"([v/]?\d{1,3}[._]\d{1,3}([._]\d{1,3})?\b)", 0u, "<VN>")},
       {6, Normal_type(R"(\d+(\.\d+)?)", 0u, "<DEC>")},
-      {7, Normal_type(R"(\W+)", 0u, "<NW>")}};
+      {7, Normal_type(R"(\W+)", 0u, "<NW>")},
+      {8, Normal_type(R"([0-9A-Fa-f]{4,})", 0u, "<HEX2>")}};
   std::unique_ptr<hs_scratch_t, decltype(hs_free_scratch)*> hs_scratch{
       nullptr, &hs_free_scratch};
   std::unique_ptr<std::ifstream> file_to_normalize;

@@ -52,12 +52,19 @@ PyObject* section2dict(Sections& section)
   return boost::python::incref(x.ptr());
 }
 
+PyObject* str2bytes(Normal_line& data)
+{
+  auto dataSize = static_cast<long>(data.line.length());
+  return PyMemoryView_FromMemory(&data.line[0], dataSize, PyBUF_READ);
+}
+
 /*! \brief This declares the python module.  The name must match the library
  *  name exactly!
  */
 BOOST_PYTHON_MODULE(normalizor)
 {
   def("section2dict", section2dict);
+  def("str2bytes", str2bytes);
   std_pair_to_python_converter<int, size_t>();
 
   /*! \brief Provides a means to simplify function overloading.  In this case

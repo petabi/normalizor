@@ -54,17 +54,10 @@ PyObject* section2dict(Sections& section)
   return boost::python::incref(x.ptr());
 }
 
-boost::python::object str2bytes(std::string& data)
+PyObject* str2bytes(Normal_line& data)
 {
-Py_buffer buffer;
-dataSize = data.length();
-int res = PyBuffer_FillInfo(&buffer, 0, data, dataSize, true, PyBUF_CONTIG_RO);
-if (res == -1) {
-    PyErr_Print();
-    exit(EXIT_FAILURE);
-       }
-    boost::python::object memoryView(boost::python::handle<>(PyMemoryView_FromMemory(data, dataSize, PyBUF_READ)));
-    return memoryView;
+  auto dataSize = static_cast<long>(data.line.length());
+  return PyMemoryView_FromMemory(&data.line[0], dataSize, PyBUF_READ);
 }
 /*! \brief This declares the python module.  The name must match the library
  *  name exactly!

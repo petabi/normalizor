@@ -12,10 +12,8 @@
 #include <boost/python.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/dict.hpp>
-#include <boost/python/handle.hpp>
 #include <boost/python/make_constructor.hpp>
 #include <boost/python/module.hpp>
-#include <boost/python/object.hpp>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/to_python_converter.hpp>

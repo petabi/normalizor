@@ -57,6 +57,7 @@ PyObject* str2bytes(Normal_line& data)
   auto dataSize = static_cast<long>(data.line.length());
   return PyMemoryView_FromMemory(&data.line[0], dataSize, PyBUF_READ);
 }
+
 /*! \brief This declares the python module.  The name must match the library
  *  name exactly!
  */

@@ -258,13 +258,11 @@ private:
       {3, Normal_type(R"(;base64,([0-9A-Za-z+/]{4}|[0-9A-Za-z+/]{3}=|)"
                       R"([0-9A-Za-z+/]{2}==)+)",
                       0u, "<B64>")},
-      {4, Normal_type(R"((\x5c{1,2}x[0-9A-Fa-f]{2}|%[0-9A-Fa-f]{2}|)"
-                      R"([\x7f-\xff])+)",
-                      0u, "<HEX>")},
-      {5,
-       Normal_type(R"([v/]?\d{1,3}[._]\d{1,3}([._]\d{1,3})?\b)", 0u, "<VN>")},
-      {6, Normal_type(R"(\d+(\.\d+)?)", 0u, "<DEC>")},
-      {7, Normal_type(R"(\W+)", 0u, "<NW>")}};
+      {4, Normal_type(R"([0-9A-Fa-f]{4,})", 0u, "<HEX>")},
+      {5, Normal_type(R"((\d+[._])+\d+)", 0u, "<VN>")},
+      {6, Normal_type(R"((([\\0]x)|%)[0-9A-Fa-f]{2})", 0u, "<HEX_PREFIX>")},
+      {7, Normal_type(R"(\d{2,})", 0u, "<DEC>")},
+      {8, Normal_type(R"(\W+)", 0u, "<NW>")}};
   std::unique_ptr<hs_scratch_t, decltype(hs_free_scratch)*> hs_scratch{
       nullptr, &hs_free_scratch};
   std::unique_ptr<std::ifstream> file_to_normalize;

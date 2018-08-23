@@ -90,10 +90,10 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
           ++sec_it;
         }
       }
-      ctx->parsed_lines.emplace_back(
-          std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary),
-          ctx->cur_sections);
     }
+    ctx->parsed_lines.emplace_back(
+        std::string(&ctx->block[ctx->last_boundary], to - ctx->last_boundary),
+        ctx->cur_sections);
     ctx->last_boundary = to;
   } else {
     if (start >= ctx->last_boundary) {

@@ -43,6 +43,20 @@ TEST(test_basic_normalization, test_normalize_lines)
   }
   EXPECT_EQ(line_count, total_lines);
   remove(my_log_file.c_str());
+
+  std::string my_line = "_char uuid_from_charUu _cHAr\n"
+                        "uuid_from_charuuid_F\n"
+                        "_char\n"
+                        "uuid_from_charuuid_F uid_FRoM_c\n";
+  std::istringstream in(my_line);
+  norm.set_input_stream(in);
+  lines = norm.get_normalized_block();
+  line_count = 0;
+  while (!lines.empty()) {
+    line_count += lines.size();
+    lines = norm.get_normalized_block();
+  }
+  EXPECT_EQ(line_count, 4);
 }
 
 TEST(test_basic_normaliztion, test_sections)

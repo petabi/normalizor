@@ -4,6 +4,7 @@
  * All rights reserved.
  */
 
+#include <cassert>
 #include <cstring>
 #include <fstream>
 #include <istream>
@@ -84,7 +85,26 @@ int Line_normalizer::on_match(unsigned int id, unsigned long long start,
       // This section is to remove sections that are contained in larger ones.
       while (sec_it != end_it) {
         if (sec_it->first < longest) {
-          sec_it = ctx->cur_sections.erase(sec_it);
+          if (sec_it->second.second < longest) {
+            // Wholly contained in previous--Must be shorter so remove.
+            sec_it = ctx->cur_sections.erase(sec_it);
+          } else {
+            // Intersection--must pick longer match or lower id
+            auto prev_it = std::prev(sec_it);
+            assert(prev_it != end_it);
+            if (prev_it->second.second - prev_it->first >
+                    sec_it->second.second - sec_it->first ||
+                (prev_it->second.second - prev_it->first ==
+                     sec_it->second.second - sec_it->first &&
+                 prev_it->second.first < sec_it->second.first)) {
+              // Previous is longer or lower ID--so keep previous.
+              sec_it = ctx->cur_sections.erase(sec_it);
+            } else {
+              // Previous is shorter, or higher id, delete previous.
+              sec_it = ctx->cur_sections.erase(prev_it);
+              ++sec_it;
+            }
+          }
         } else {
           longest = sec_it->second.second;
           ++sec_it;

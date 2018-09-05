@@ -61,17 +61,16 @@ TEST(test_basic_normalization, test_normalize_lines)
 
 TEST(test_basic_normaliztion, test_sections)
 {
-  std::string my_line = "12/31/1999 12:59:59 an ip 4.56.789.0 a"
-                        ";base64,0A1B a hex \\x0b and a vn v1.2_3"
-                        " a num 123 lala\n";
+  std::string my_line = "12/31/1999 12:59:59 an ip 4.56.789.0 a;base64,0A1B a "
+                        "hex \\x0b and a vn v1.2_3 a num 123 lala\n";
   Line_normalizer norm;
   std::istringstream in(my_line);
   norm.set_input_stream(in);
   auto lines = norm.get_normalized_block();
   EXPECT_EQ(lines.empty(), false);
-  EXPECT_EQ(lines.front().sections.size(), 20);
-  std::vector<int> sec_ids = {1, 8, 8, 8, 2, 8, 3, 8, 8, 8,
+  std::vector<int> sec_ids = {1, 8, 8, 8, 2, 8, 3, 8, 8, 6,
                               8, 8, 8, 8, 5, 8, 8, 8, 7, 8};
+  EXPECT_EQ(lines.front().sections.size(), sec_ids.size());
   auto sec_it = lines.front().sections.begin();
   auto sec_id = sec_ids.begin();
   EXPECT_EQ(lines.front().line, my_line);

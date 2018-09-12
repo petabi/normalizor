@@ -38,15 +38,16 @@
 
 /*!
  * \brief The size of the number of characters (or bytes) processed at once.
- * This size was chosen after some tests on the local machine as offering
+ * This size was chosen after some tests on a local machine as offering
  * the best performance to memory usage.
  */
 constexpr size_t blocksize = 2097152;
 
 /*!
  * \brief Most log entries we have seen are 100 or more chars long.  That would
- * make roughly 21k lines per block.  32k lines gives us room before any need
- * to grow.
+ * make roughly 21k lines per block (given the default blocksize).
+ * Thus, 32k lines gives us room before any need to grow and limits the
+ * possibility of having to resize data structures.
  */
 constexpr size_t base_lines = 32768;
 
@@ -58,7 +59,8 @@ constexpr size_t base_lines = 32768;
  * flags modifying the regular expression, and a replacement value.  The
  * regular expression (and flags) are used to identify the section during
  * normalization.  The replacement string can be used to replace the normalize
- * section.
+ * section (it is not used in this code directly and is held here for
+ * user convenience).
  */
 struct Normal_type {
   Normal_type() : regex(), replacement() {}
@@ -189,7 +191,7 @@ public:
 
   /*!
    * \brief Parses one block of the input stream and returns a vector of normal
-   * lines for that sub set (block) of the input stream.  Continue to call
+   * lines for that block of the input stream.  Continue to call
    * this function until it returns an empty vector.  The empty vector
    * indicates the end of the input.
    *

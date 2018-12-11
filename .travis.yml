@@ -3,9 +3,10 @@ language: cpp
 compiler: clang
 
 addons:
-  packages:
-    - libboost-system-dev
-    - libgtest-dev
+  apt:
+    packages:
+      - libboost-system-dev
+      - libgtest-dev
 
 script:
   - cmake .
